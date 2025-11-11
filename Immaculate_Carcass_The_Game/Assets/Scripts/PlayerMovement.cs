@@ -1,54 +1,50 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Collider))]
-public class PlayerGridMover : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
-    public float moveSpeed = 3f;
-    public LayerMask groundMask;
-    public Vector3 visualOffset = new Vector3(0f, 0f, 0f);
-    public float yOffset = 0.0f;
-
-    private GridManager grid;
-    private Camera cam;
-    private Vector3 targetPos;
+    public float moveSpeed = 5f;
+    public float stopDistance = 0.1f;
+    private Vector3 targetPosition;
     private bool moving;
 
-    void Awake()
+    private Animator anim;   // we'll use later
+
+    void Start()
     {
-        grid = FindObjectOfType<GridManager>();
-        cam = Camera.main;
-        targetPos = transform.position;
+        targetPosition = transform.position;
+        anim = GetComponent<Animator>();
     }
 
     void Update()
     {
+        // Left-click to set destination
         if (Input.GetMouseButtonDown(0))
-            TrySetTargetFromClick();
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hit))
+            {
+                targetPosition = hit.point;
+                moving = true;
+                if (anim) anim.SetBool("isMoving", true);
+            }
+        }
 
         if (moving)
         {
-            transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
-            if ((transform.position - targetPos).sqrMagnitude < 0.0004f)
+            Vector3 direction = (targetPosition - transform.position).normalized;
+            direction.y = 0; // ignore vertical tilt
+
+            // face the direction of travel
+            if (direction != Vector3.zero)
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), 0.15f);
+
+            transform.position += direction * moveSpeed * Time.deltaTime;
+
+            if (Vector3.Distance(transform.position, targetPosition) < stopDistance)
+            {
                 moving = false;
+                if (anim) anim.SetBool("isMoving", false);
+            }
         }
-    }
-
-    void TrySetTargetFromClick()
-    {
-        if (!cam || !grid) return;
-
-        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, groundMask))
-        {
-            Vector2Int cell = grid.WorldToCell(hit.point);
-            targetPos = grid.CellCenter(cell, hit.point.y) + visualOffset + new Vector3(0f, yOffset, 0f);
-            moving = true;
-        }
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(targetPos, 0.1f);
     }
 }
