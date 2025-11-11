@@ -267,8 +267,8 @@ Camera:
   m_GameObject: {fileID: 1380795756}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0, g: 0.003921569, b: 0.003921569, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -290,10 +290,10 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 10000
   field of view: 60
-  orthographic: 0
-  orthographic size: 5
+  orthographic: 1
+  orthographic size: 841
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -317,13 +317,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1380795756}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.43389666, y: -0, z: -0, w: 0.90096265}
-  m_LocalPosition: {x: 0, y: 830, z: -275.9}
+  m_LocalRotation: {x: 0.23911765, y: 0.3696438, z: -0.09904577, w: 0.89239913}
+  m_LocalPosition: {x: -1795, y: 1523, z: -1652}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 51.43, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 30, y: 45, z: 0}
 --- !u!114 &1380795760
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -530,7 +530,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   moveSpeed: 50
-  stopDistance: 0.1
+  stopDistance: 15
+  stopBeforeEnemy: 2
+  combatTriggerDistance: 20
 --- !u!54 &1992083185
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -685,6 +687,11 @@ PrefabInstance:
     - target: {fileID: 201573391533932010, guid: 94e0f2ced2cb6fb4caab95345f93c76a,
         type: 3}
       propertyPath: m_Name
+      value: Enemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 201573391533932010, guid: 94e0f2ced2cb6fb4caab95345f93c76a,
+        type: 3}
+      propertyPath: m_TagString
       value: Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 8629623082282704708, guid: 94e0f2ced2cb6fb4caab95345f93c76a,
