@@ -529,7 +529,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80e2e85e70b3cde41b616683e6f41372, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  moveSpeed: 50
+  moveSpeed: 200
   stopDistance: 15
   stopBeforeEnemy: 2
   combatTriggerDistance: 20
