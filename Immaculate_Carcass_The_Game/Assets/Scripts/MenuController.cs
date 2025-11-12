@@ -7,6 +7,7 @@ public class MenuController : MonoBehaviour
 
     public void PlayGame()
     {
+         Debug.Log("PlayGame() triggered!");
         if (fader != null)
             fader.FadeToScene("GameScene");
         else

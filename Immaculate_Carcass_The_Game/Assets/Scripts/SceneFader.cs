@@ -7,13 +7,17 @@ public class SceneFader : MonoBehaviour
 {
     public Image fadeImage;
     public float fadeDuration = 1f;
-
+    public AudioSource transitionSound;
     void Awake()
     {
         DontDestroyOnLoad(gameObject);
         if (fadeImage != null)
             fadeImage.color = new Color(0, 0, 0, 0);
     }
+    void Start()
+        {
+            Debug.Log("SceneFader Awake + Start working");
+        }
 
     public void FadeToScene(string sceneName)
     {
@@ -22,6 +26,10 @@ public class SceneFader : MonoBehaviour
 
     IEnumerator FadeOut(string sceneName)
     {
+        if (transitionSound != null)
+        {
+            transitionSound.Play();
+        }
         float t = 0f;
         Color c = fadeImage.color;
 
