@@ -119,6 +119,30 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &714716740 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 201573391533932010, guid: 94e0f2ced2cb6fb4caab95345f93c76a,
+    type: 3}
+  m_PrefabInstance: {fileID: 7551464973685372016}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &714716741
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 714716740}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bec7c2a9bcc71764cb7d6396e0b9ac43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PatrollingAI
+  speed: 80
+  patrolRadius: 250
+  waitTime: 2
+  chaseRange: 300
+  stopChaseRange: 300
+  engageCombatDistance: 150
 --- !u!1 &783279795
 GameObject:
   m_ObjectHideFlags: 0
@@ -702,7 +726,7 @@ PrefabInstance:
     - target: {fileID: 8629623082282704708, guid: 94e0f2ced2cb6fb4caab95345f93c76a,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 68
+      value: 48.8
       objectReference: {fileID: 0}
     - target: {fileID: 8629623082282704708, guid: 94e0f2ced2cb6fb4caab95345f93c76a,
         type: 3}
@@ -747,7 +771,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 201573391533932010, guid: 94e0f2ced2cb6fb4caab95345f93c76a,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 714716741}
   m_SourcePrefab: {fileID: 100100000, guid: 94e0f2ced2cb6fb4caab95345f93c76a, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
