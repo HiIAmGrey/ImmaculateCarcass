@@ -6,34 +6,37 @@ public class EnemyController : MonoBehaviour
     public int enemyDamage = 3;
     public GameObject damageNumberPrefab;
     public Transform damageSpawnPoint;
+    public System.Action onEnemyDamaged;
+    public System.Action onEnemyDied;
 
     public Canvas combatCanvas; 
 
-    public void TakeDamage(int dmg)
-    {
-        Vector3 screenPos = Camera.main.WorldToScreenPoint(damageSpawnPoint.position);
+public void TakeDamage(int dmg)
+{
+    // damage text code stays the same
+    Vector3 screenPos = Camera.main.WorldToScreenPoint(damageSpawnPoint.position);
 
-        GameObject dmgNum = Instantiate(damageNumberPrefab, combatCanvas.transform);
+    GameObject dmgNum = Instantiate(damageNumberPrefab, CombatManager.Instance.combatCanvas);
+    RectTransform canvasRect = CombatManager.Instance.combatCanvas;
+    RectTransform dmgRect = dmgNum.GetComponent<RectTransform>();
 
-        RectTransform canvasRect = combatCanvas.GetComponent<RectTransform>();
-        RectTransform dmgRect = dmgNum.GetComponent<RectTransform>();
+    Vector2 uiPos;
+    RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenPos, null, out uiPos);
+    dmgRect.anchoredPosition = uiPos;
 
-        Vector2 uiPos;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            canvasRect,
-            screenPos,
-            null,
-            out uiPos
-        );
+    dmgNum.GetComponent<FloatingDamage>().ShowDamage(dmg);
 
-        dmgRect.anchoredPosition = uiPos;
+    // apply damage
+    enemyHealth -= dmg;
+    if (enemyHealth < 0) enemyHealth = 0;
 
-        dmgNum.GetComponent<FloatingDamage>().ShowDamage(dmg);
+    // tell UI the HP changed
+    onEnemyDamaged?.Invoke();
 
-        enemyHealth -= dmg;
-        if (enemyHealth <= 0)
-            Die();
-    }
+    if (enemyHealth <= 0)
+        Die();
+}
+
 
     public void TakeTurn()
     {
@@ -50,9 +53,13 @@ public class EnemyController : MonoBehaviour
         TurnManager.Instance.EndEnemyTurn();
     }
 
-    void Die()
-    {
-        CombatManager.Instance.EnemyDied(this);
-        Destroy(gameObject);
-    }
+   void Die()
+{
+    Debug.Log("Enemy died!");
+
+    onEnemyDied?.Invoke();
+    CombatManager.Instance.EnemyDied(this);
+
+    Destroy(gameObject);
+}
 }
