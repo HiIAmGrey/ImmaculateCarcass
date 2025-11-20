@@ -693,6 +693,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68787bb06bb532947a1d7e8dd7140ec9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CombatManager
+  combatCanvas: {fileID: 635876392}
   enemies: []
   currentEnemyIndex: 0
   enemyUIPrefab: {fileID: 9124597723560133385, guid: d2157a3da87f3aa488fa4b4dbd36f92f,
@@ -1081,8 +1082,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -48.5, y: 51.6}
-  m_SizeDelta: {x: 0, y: 600}
+  m_AnchoredPosition: {x: -201, y: 347}
+  m_SizeDelta: {x: 0, y: 381.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &794761388
 MonoBehaviour:
