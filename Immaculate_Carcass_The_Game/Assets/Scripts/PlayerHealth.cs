@@ -8,6 +8,7 @@ public class PlayerHealth : MonoBehaviour
     public int maxHealth = 100;
     public int currentHealth;
     private float smoothFill;
+    public static PlayerHealth Instance;
 
     [Header("UI Elements")]
     public Image hpFill;           // Drag HpFill image here
@@ -15,6 +16,7 @@ public class PlayerHealth : MonoBehaviour
 
     void Start()
     {
+         Instance = this;
         currentHealth = maxHealth;
         smoothFill = 1f;
         UpdateHealthUI();
