@@ -16,8 +16,12 @@ public class TurnManager : MonoBehaviour
     public void EndPlayerTurn()
     {
         state = TurnState.EnemyTurn;
-        EnemyController.Instance.TakeTurn();
+
+        var enemy = CombatManager.Instance.GetCurrentEnemy();
+        if (enemy != null)
+            enemy.TakeTurn();
     }
+
 
     public void EndEnemyTurn()
     {

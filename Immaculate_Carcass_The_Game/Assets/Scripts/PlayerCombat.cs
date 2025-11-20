@@ -10,16 +10,25 @@ public class PlayerCombat : MonoBehaviour
     void Awake()
     {
         Instance = this;
+         Debug.Log("PlayerCombat Awake — CombatManager.Instance = " + CombatManager.Instance);
     }
 
     public void Attack()
-    {
-        if (TurnManager.Instance.state != TurnState.PlayerTurn)
-            return;
+        {
+            Debug.Log("Enemy count = " + CombatManager.Instance.enemies.Count);
+            Debug.Log("Current enemy = " + CombatManager.Instance.GetCurrentEnemy());
 
-        EnemyController.Instance.TakeDamage(attackDamage);
-        TurnManager.Instance.EndPlayerTurn();
-    }
+            if (TurnManager.Instance.state != TurnState.PlayerTurn)
+                return;
+
+            var enemy = CombatManager.Instance.GetCurrentEnemy();
+
+            if (enemy != null)
+                enemy.TakeDamage(attackDamage);
+
+            TurnManager.Instance.EndPlayerTurn();
+        }
+
 
     public void Guard()
     {
@@ -28,7 +37,7 @@ public class PlayerCombat : MonoBehaviour
 
         isGuarding = true;
 
-        // OPTIONAL: show UI later
+        //  show in UI later
         Debug.Log("Player is guarding!");
 
         TurnManager.Instance.EndPlayerTurn();
