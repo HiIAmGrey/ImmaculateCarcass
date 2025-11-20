@@ -13,6 +13,8 @@ public class PlayerHealth : MonoBehaviour
     [Header("UI Elements")]
     public Image hpFill;           // Drag HpFill image here
     public TMP_Text hpText;        // Drag TMP text object (for HP numbers)
+    public Transform damageSpawnPoint;
+    public GameObject playerDamagePrefab;
 
     void Start()
     {
@@ -34,11 +36,33 @@ public class PlayerHealth : MonoBehaviour
             Heal(10);
     }
 
-    public void TakeDamage(int damage)
-    {
-        currentHealth -= damage;
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-    }
+    public void TakeDamage(int amount)
+        {
+            currentHealth -= amount;
+            if (currentHealth < 0) currentHealth = 0;
+
+            // spawn the floating damage UI
+            if (playerDamagePrefab != null && damageSpawnPoint != null)
+            {
+                Vector3 screenPos = Camera.main.WorldToScreenPoint(damageSpawnPoint.position);
+
+                GameObject dmgObj = Instantiate(playerDamagePrefab, CombatManager.Instance.combatCanvas);
+                RectTransform canvasRect = CombatManager.Instance.combatCanvas;
+                RectTransform dmgRect = dmgObj.GetComponent<RectTransform>();
+
+                Vector2 uiPos;
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenPos, null, out uiPos);
+                dmgRect.anchoredPosition = uiPos;
+
+                dmgObj.GetComponent<FloatingDamage>().ShowDamage(amount);
+            }
+
+            // update the player HP UI
+            UpdateHealthUI();
+
+            // if player dies implement death logic here
+        }
+
 
     public void Heal(int amount)
     {

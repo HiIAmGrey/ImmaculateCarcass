@@ -465,6 +465,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 162943991}
   m_CullTransparentMesh: 1
+--- !u!1 &245603017
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 245603018}
+  m_Layer: 0
+  m_Name: PlayerDamageSpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &245603018
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 245603017}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.76, y: 0.572, z: -0.99}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2078628117}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &333318529
 GameObject:
   m_ObjectHideFlags: 0
@@ -571,7 +602,7 @@ Transform:
   m_GameObject: {fileID: 333318529}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 487, y: 159, z: 841}
+  m_LocalPosition: {x: 556, y: 159, z: 841}
   m_LocalScale: {x: 93.9, y: 246.50388, z: 93.9}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -2598,7 +2629,7 @@ Transform:
   m_GameObject: {fileID: 1928565526}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 102.49999, y: 159, z: 841}
+  m_LocalPosition: {x: -26, y: 159, z: 841}
   m_LocalScale: {x: 93.9, y: 246.50388, z: 93.9}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -2808,7 +2839,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 184, z: -72.1}
   m_LocalScale: {x: 73.9, y: 228.75224, z: 73.9}
   m_ConstrainProportionsScale: 1
-  m_Children: []
+  m_Children:
+  - {fileID: 245603018}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2078628118
@@ -2827,6 +2859,9 @@ MonoBehaviour:
   currentHealth: 100
   hpFill: {fileID: 1208601339}
   hpText: {fileID: 1486103925}
+  damageSpawnPoint: {fileID: 245603018}
+  playerDamagePrefab: {fileID: 7469945538737787350, guid: c2cc2fd489fd2404aa01b10ef332b25a,
+    type: 3}
 --- !u!114 &2078628119
 MonoBehaviour:
   m_ObjectHideFlags: 0
