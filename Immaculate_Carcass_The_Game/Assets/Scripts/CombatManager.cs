@@ -5,43 +5,63 @@ public class CombatManager : MonoBehaviour
 {
     public static CombatManager Instance;
 
-    // this is just the combat canvas so I can reference it later if needed
     public RectTransform combatCanvas;
 
     public List<EnemyController> enemies = new List<EnemyController>();
     public int currentEnemyIndex = 0;
 
-    public GameObject enemyUIPrefab;   // the prefab for the enemy UI entry
-    public Transform enemyUIPanel;     // the whole UI panel on the right side
+    public GameObject enemyUIPrefab;   
+    public Transform enemyUIPanel;
+
+    // whichever enemy the player clicked on
+    public EnemyController selectedEnemy; 
 
     void Awake()
     {
         Instance = this;
 
-        // finding all the enemies in the scene so I can set up their UI
+        // grab every enemy in the scene
         EnemyController[] foundEnemies = FindObjectsOfType<EnemyController>();
         enemies.AddRange(foundEnemies);
 
         Debug.Log("CombatManager found " + enemies.Count + " enemies.");
 
-        // spawn a UI entry for each enemy
+        // make a UI entry for each enemy
         foreach (var enemy in enemies)
         {
             GameObject ui = Instantiate(enemyUIPrefab, enemyUIPanel);
             ui.GetComponent<EnemyUIEntry>().Initialize(enemy);
+
+            // auto-select the first enemy so there's always a valid target
+            if (selectedEnemy == null)
+                selectedEnemy = enemy;
         }
 
-        // if somehow there are no enemies at the start, just hide the panel
+        // nothing to show if there's no enemies somehow
         if (enemies.Count == 0 && enemyUIPanel != null)
             enemyUIPanel.gameObject.SetActive(false);
     }
 
+    // returns the enemy the player clicked
+    public EnemyController GetSelectedEnemy()
+    {
+        return selectedEnemy;
+    }
+
+    // old function still here just in case some old code uses it
     public EnemyController GetCurrentEnemy()
     {
         if (enemies.Count == 0)
-            return null; // there's literally no enemy left lol
+            return null;
 
         return enemies[currentEnemyIndex];
+    }
+
+    // UI calls this when the player clicks an enemy button
+    public void SetSelectedEnemy(EnemyController enemy)
+    {
+        selectedEnemy = enemy;
+        Debug.Log("Selected enemy: " + enemy.gameObject.name);
     }
 
     public void EnemyDied(EnemyController enemy)
@@ -54,15 +74,19 @@ public class CombatManager : MonoBehaviour
         {
             Debug.Log("All enemies defeated. Combat ends!");
 
-            // hide the whole UI panel so there's not an empty box sitting there
+            // hide the UI panel so it's not just a blank box
             if (enemyUIPanel != null)
                 enemyUIPanel.gameObject.SetActive(false);
 
             return;
         }
 
-        // make sure the index doesn't go out of bounds
+        // keep index in bounds
         if (currentEnemyIndex >= enemies.Count)
             currentEnemyIndex = enemies.Count - 1;
+
+        // if the one that died was the selected target, just select a new one
+        if (selectedEnemy == enemy)
+            selectedEnemy = enemies[0];
     }
 }
