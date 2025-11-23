@@ -61,6 +61,11 @@ public class CombatManager : MonoBehaviour
     public void SetSelectedEnemy(EnemyController enemy)
     {
         selectedEnemy = enemy;
+         foreach (var e in enemies)
+    {
+        bool isSelected = (e == enemy);
+        e.SetTargetArrow(isSelected);
+    }
         Debug.Log("Selected enemy: " + enemy.gameObject.name);
     }
 

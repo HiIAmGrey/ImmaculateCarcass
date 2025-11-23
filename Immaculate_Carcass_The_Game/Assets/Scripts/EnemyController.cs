@@ -8,6 +8,7 @@ public class EnemyController : MonoBehaviour
     public Transform damageSpawnPoint;
     public System.Action onEnemyDamaged;
     public System.Action onEnemyDied;
+    public GameObject targetArrow;
 
     public Canvas combatCanvas; 
 
@@ -62,4 +63,10 @@ public void TakeDamage(int dmg)
 
     Destroy(gameObject);
 }
+public void SetTargetArrow(bool on)
+{
+    if (targetArrow != null)
+        targetArrow.SetActive(on);
+}
+
 }
