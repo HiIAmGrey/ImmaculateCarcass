@@ -57,7 +57,9 @@ public void TakeDamage(int dmg)
    void Die()
 {
     Debug.Log("Enemy died!");
-
+    // Give XP to the player
+    PlayerStats.Instance.AddXP(5);
+    
     onEnemyDied?.Invoke();
     CombatManager.Instance.EnemyDied(this);
 
