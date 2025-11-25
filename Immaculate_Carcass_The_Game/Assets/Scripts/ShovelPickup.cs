@@ -3,7 +3,7 @@ using UnityEngine;
 public class ShovelPickup : MonoBehaviour
 {
     private bool playerInRange = false;
-
+    
     void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player")) return;
@@ -12,7 +12,15 @@ public class ShovelPickup : MonoBehaviour
 
         UIInteractionPrompt.Instance.ShowPrompt("Press E to pick up the shovel");
     }
-
+   void Start()
+    {
+        // if the player already picked up the shovel before
+        // this world object shouldn't exist anymore
+        if (PersistentGameState.hasShovel)
+        {
+            gameObject.SetActive(false);
+        }
+    }
     void OnTriggerExit(Collider other)
     {
         if (!other.CompareTag("Player")) return;
@@ -26,8 +34,7 @@ public class ShovelPickup : MonoBehaviour
         if (playerInRange && Input.GetKeyDown(KeyCode.E))
         {
             // playergets the shovel
-            PlayerInventory.Instance.hasShovel = true;
-
+            PlayerInventory.Instance.PickUpShovel();
             // Hide the prompt
             UIInteractionPrompt.Instance.HidePrompt();
 

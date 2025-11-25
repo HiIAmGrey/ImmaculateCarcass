@@ -11,18 +11,27 @@ public class PlayerHealth : MonoBehaviour
     public static PlayerHealth Instance;
 
     [Header("UI Elements")]
-    public Image hpFill;           // Drag HpFill image here
-    public TMP_Text hpText;        // Drag TMP text object (for HP numbers)
+    public Image hpFill;           
+    public TMP_Text hpText;        
     public Transform damageSpawnPoint;
     public GameObject playerDamagePrefab;
 
     void Start()
     {
-         Instance = this;
-        currentHealth = maxHealth;
-        smoothFill = 1f;
+        // set global reference
+        Instance = this;
+
+        // load from persistent state (or defaults on new game)
+        maxHealth = PersistentGameState.playerMaxHP;
+        currentHealth = PersistentGameState.playerCurrentHP;
+
+        // correct fill state
+        if (maxHealth > 0)
+            smoothFill = (float)currentHealth / maxHealth;
+        else
+            smoothFill = 1f;
+
         UpdateHealthUI();
-        
     }
 
     void Update()
@@ -38,37 +47,46 @@ public class PlayerHealth : MonoBehaviour
     }
 
     public void TakeDamage(int amount)
+    {
+        currentHealth -= amount;
+        if (currentHealth < 0)
+            currentHealth = 0;
+
+        // save updated HP to persistent system
+        PersistentGameState.playerCurrentHP = currentHealth;
+        PersistentGameState.playerMaxHP = maxHealth;
+
+        // spawn floating damage UI
+        if (playerDamagePrefab != null && damageSpawnPoint != null)
         {
-            currentHealth -= amount;
-            if (currentHealth < 0) currentHealth = 0;
+            Vector3 screenPos = Camera.main.WorldToScreenPoint(damageSpawnPoint.position);
 
-            // spawn the floating damage UI
-            if (playerDamagePrefab != null && damageSpawnPoint != null)
-            {
-                Vector3 screenPos = Camera.main.WorldToScreenPoint(damageSpawnPoint.position);
+            GameObject dmgObj = Instantiate(playerDamagePrefab, CombatManager.Instance.combatCanvas);
+            RectTransform canvasRect = CombatManager.Instance.combatCanvas;
+            RectTransform dmgRect = dmgObj.GetComponent<RectTransform>();
 
-                GameObject dmgObj = Instantiate(playerDamagePrefab, CombatManager.Instance.combatCanvas);
-                RectTransform canvasRect = CombatManager.Instance.combatCanvas;
-                RectTransform dmgRect = dmgObj.GetComponent<RectTransform>();
+            Vector2 uiPos;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenPos, null, out uiPos);
+            dmgRect.anchoredPosition = uiPos;
 
-                Vector2 uiPos;
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenPos, null, out uiPos);
-                dmgRect.anchoredPosition = uiPos;
-
-                dmgObj.GetComponent<FloatingDamage>().ShowDamage(amount);
-            }
-
-            // update the player HP UI
-            UpdateHealthUI();
-
-            // if player dies implement death logic here
+            dmgObj.GetComponent<FloatingDamage>().ShowDamage(amount);
         }
+
+        // update HUD
+        UpdateHealthUI();
+
+        // handle death if needed (not implemented yet)
+    }
 
 
     public void Heal(int amount)
     {
         currentHealth += amount;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+
+        // save persistent health
+        PersistentGameState.playerCurrentHP = currentHealth;
+        PersistentGameState.playerMaxHP = maxHealth;
     }
 
     private void UpdateHealthUI()
@@ -80,15 +98,15 @@ public class PlayerHealth : MonoBehaviour
             hpFill.fillAmount = smoothFill;
 
             // HP Color Change 
-            Color healthy = new Color(0.5f, 0f, 0f);   // deep crimson
-            Color dying = new Color(0.15f, 0f, 0f);    // almost black-red
+            Color healthy = new Color(0.5f, 0f, 0f);   
+            Color dying = new Color(0.15f, 0f, 0f);   
             Color currentColor = Color.Lerp(dying, healthy, smoothFill);
 
             // Low-HP pulsing 
             if (smoothFill < 0.3f)
             {
-                float pulse = Mathf.Sin(Time.time * 6f) * 0.25f + 0.75f; // subtle pulse between 0.5–1
-                currentColor *= pulse; // slightly brighten/dim
+                float pulse = Mathf.Sin(Time.time * 6f) * 0.25f + 0.75f;
+                currentColor *= pulse;
             }
 
             hpFill.color = currentColor;
