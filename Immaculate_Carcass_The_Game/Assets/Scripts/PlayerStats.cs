@@ -18,10 +18,20 @@ public class PlayerStats : MonoBehaviour
         Instance = this;
     }
 
+    void Start()
+    {
+        // load level & XP from persistent data
+        level = PersistentGameState.playerLevel;
+        xp = PersistentGameState.playerXP;
+    }
+
     public void AddXP(int amount)
     {
         xp += amount;
         Debug.Log("Gained XP: " + amount + " (Total: " + xp + ")");
+
+        // save new XP immediately
+        PersistentGameState.playerXP = xp;
 
         if (xp >= xpToNextLevel)
             LevelUp();
@@ -31,12 +41,18 @@ public class PlayerStats : MonoBehaviour
     {
         xp -= xpToNextLevel;
         level++;
-        xpToNextLevel = Mathf.RoundToInt(xpToNextLevel * 1.3f); // progressive scaling
+        xpToNextLevel = Mathf.RoundToInt(xpToNextLevel * 1.3f);
 
         // increase stats
         PlayerCombat.Instance.attackDamage += attackIncreasePerLevel;
         PlayerHealth.Instance.maxHealth += healthIncreasePerLevel;
         PlayerHealth.Instance.currentHealth = PlayerHealth.Instance.maxHealth;
+
+        // save new level and HP to persistent data
+        PersistentGameState.playerLevel = level;
+        PersistentGameState.playerXP = xp;
+        PersistentGameState.playerMaxHP = PlayerHealth.Instance.maxHealth;
+        PersistentGameState.playerCurrentHP = PlayerHealth.Instance.currentHealth;
 
         Debug.Log("LEVEL UP! Now level " + level);
     }
