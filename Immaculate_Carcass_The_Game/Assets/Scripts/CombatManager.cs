@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class CombatManager : MonoBehaviour
 {
@@ -83,6 +84,7 @@ public class CombatManager : MonoBehaviour
             if (enemyUIPanel != null)
                 enemyUIPanel.gameObject.SetActive(false);
 
+            ExitCombat(); // go back to main game scene
             return;
         }
 
@@ -94,4 +96,13 @@ public class CombatManager : MonoBehaviour
         if (selectedEnemy == enemy)
             selectedEnemy = enemies[0];
     }
+
+    public void ExitCombat()
+{
+    // Here is where persistent stats will be restored later 
+    // PersistentGameState.Load();
+
+    SceneManager.LoadScene("GameScene");
+}
+
 }
