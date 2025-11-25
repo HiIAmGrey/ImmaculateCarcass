@@ -1,39 +1,55 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
 public class PatrollingAI : MonoBehaviour
 {
+    public int aiID = 0; // used for persistent death tracking
+
     public float speed = 3f;
     public float patrolRadius = 5f;
     public float waitTime = 2f;
-    public float chaseRange = 5f;     // distance at which AI begins chasing
-    public float stopChaseRange = 8f; // distance at which AI gives up chasing
+    public float chaseRange = 5f;
+    public float stopChaseRange = 8f;
 
-    public float engageCombatDistance = 2f; // aggro range for AI
+    public float engageCombatDistance = 2f;
+
     private Vector3 patrolTarget;
     private float waitTimer;
-
     private Transform player;
 
     private enum AIState { Patrol, Waiting, Chase, Return }
     private AIState state = AIState.Patrol;
+
     private Vector3 lastPatrolPoint;
+
     void Start()
     {
-    GameObject p = GameObject.FindGameObjectWithTag("Player");
+        // Prevent respawning dead enemies
+        if (PersistentGameState.overworldAIDead[aiID])
+        {
+            gameObject.SetActive(false);
+            return;
+        }
 
-            if (p == null)
-            {
-                Debug.LogError("⚠️ ERROR: No GameObject tagged 'Player' found in scene!");
-            }
-            else
-            {
-                player = p.transform;
-            }
+        GameObject p = GameObject.FindGameObjectWithTag("Player");
+
+        if (p == null)
+        {
+            Debug.LogError("⚠️ ERROR: No GameObject tagged 'Player' found in scene!");
+        }
+        else
+        {
+            player = p.transform;
+        }
+
         PickNewPatrolTarget();
     }
 
     void Update()
-    {    
+    {
+        if (player == null)
+            return;
+
         float distToPlayer = Vector3.Distance(transform.position, player.position);
 
         switch (state)
@@ -49,6 +65,7 @@ public class PatrollingAI : MonoBehaviour
             case AIState.Chase:
                 ChaseBehavior(distToPlayer);
                 break;
+
             case AIState.Return:
                 ReturnBehavior(distToPlayer);
                 break;
@@ -60,21 +77,18 @@ public class PatrollingAI : MonoBehaviour
     // ─────────────────────────────────────────────
     void PatrolBehavior(float distToPlayer)
     {
-        // Chase if player is close enough
         if (distToPlayer <= chaseRange)
         {
             state = AIState.Chase;
             return;
         }
 
-        // Move toward patrol target
         transform.position = Vector3.MoveTowards(
             transform.position,
             patrolTarget,
             speed * Time.deltaTime
         );
 
-        // Reached patrol point → wait
         if (Vector3.Distance(transform.position, patrolTarget) < 0.3f)
         {
             waitTimer = waitTime;
@@ -106,29 +120,67 @@ public class PatrollingAI : MonoBehaviour
     // ─────────────────────────────────────────────
     void ChaseBehavior(float distToPlayer)
     {
-        // Move toward player
         transform.position = Vector3.MoveTowards(
             transform.position,
             player.position,
-            speed * 1.2f * Time.deltaTime // chase slightly faster
-            
+            speed * 1.2f * Time.deltaTime
         );
+
         Debug.Log("Chasing player!");
 
-        // If close enough, trigger combat scene
+        // COMBAT TRIGGER LOGIC
         if (distToPlayer <= engageCombatDistance)
         {
             Debug.Log("Enemy reached player — loading combat scene!");
-            SceneManager.LoadScene("CombatScene");   
+
+            // Save player position before combat
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null)
+            {
+                PersistentGameState.savedPlayerPos = playerObj.transform.position;
+                PersistentGameState.hasSavedPlayerPos = true;
+            }
+
+            // Save all game data
+            PersistentGameState.SaveFromGame();
+
+            // Pass encounter ID
+            PersistentGameState.isOverworldEncounter = true;
+            EnemyEncounterManager.SetEncounterID(aiID);
+
+            // Load combat
+            SceneManager.LoadScene("CombatScene");
             return;
         }
-    
-        // If player gets far enough away, stop chasing
-       if (distToPlayer > stopChaseRange)
-      {
-        Debug.Log("Player escaped — returning to patrol point.");
-        state = AIState.Return;
-      }
+
+        if (distToPlayer > stopChaseRange)
+        {
+            Debug.Log("Player escaped — returning to patrol point.");
+            state = AIState.Return;
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    // Return State
+    // ─────────────────────────────────────────────
+    void ReturnBehavior(float distToPlayer)
+    {
+        if (distToPlayer <= chaseRange)
+        {
+            state = AIState.Chase;
+            return;
+        }
+
+        transform.position = Vector3.MoveTowards(
+            transform.position,
+            lastPatrolPoint,
+            speed * Time.deltaTime
+        );
+
+        if (Vector3.Distance(transform.position, lastPatrolPoint) < 0.3f)
+        {
+            state = AIState.Patrol;
+        }
     }
 
     // ─────────────────────────────────────────────
@@ -143,27 +195,7 @@ public class PatrollingAI : MonoBehaviour
             transform.position.y,
             transform.position.z + circle.y
         );
+
         lastPatrolPoint = patrolTarget;
-    }
-    void ReturnBehavior(float distToPlayer)
-    {
-        // If player re-enters chase range during return, chase again
-        if (distToPlayer <= chaseRange)
-        {
-            state = AIState.Chase;
-            return;
-        }
-
-        transform.position = Vector3.MoveTowards(
-            transform.position,
-            lastPatrolPoint,
-            speed * Time.deltaTime
-        );
-
-        // Once the enemy reaches the saved patrol point, resume patrol
-        if (Vector3.Distance(transform.position, lastPatrolPoint) < 0.3f)
-        {
-            state = AIState.Patrol;
-        }
     }
 }

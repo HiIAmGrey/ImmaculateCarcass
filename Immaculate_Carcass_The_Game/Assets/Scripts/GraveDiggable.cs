@@ -82,7 +82,18 @@ public class GraveDiggable : MonoBehaviour
         SetToDugAppearance();
 
         // Begin encounter
-        EnemyEncounterManager.SetEncounterID(PersistentGameState.graveCount);
+            // Graves use encounter IDs 0–99 to avoid collision with other encounters
+            PersistentGameState.isOverworldEncounter = false;
+            EnemyEncounterManager.SetEncounterID(10 + graveID);
+
+            // Save the player’s current position BEFORE combat
+            PersistentGameState.savedPlayerPos = 
+                GameObject.FindGameObjectWithTag("Player").transform.position;
+
+            PersistentGameState.hasSavedPlayerPos = true;
+
+            // Save everything else
+            PersistentGameState.SaveFromGame();
 
         SceneManager.LoadScene("CombatScene");
     }

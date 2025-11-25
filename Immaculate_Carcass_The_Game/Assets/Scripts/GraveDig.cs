@@ -35,6 +35,7 @@ public class GraveDig : MonoBehaviour
         SetToDugAppearance();
 
         // Load combat with correct encounter ID
+        PersistentGameState.isOverworldEncounter = false;
         EnemyEncounterManager.SetEncounterID(GraveDigTracker.dugCount);
 
         SceneManager.LoadScene("CombatScene");

@@ -54,17 +54,35 @@ public void TakeDamage(int dmg)
         TurnManager.Instance.EndEnemyTurn();
     }
 
-   void Die()
+void Die()
 {
     Debug.Log("Enemy died!");
-    // Give XP to the player
+
+    // 1. Mark overworld enemy as dead
+    if (PersistentGameState.encounterID >= 0)
+    {
+        if (PersistentGameState.isOverworldEncounter)
+            {
+                PersistentGameState.overworldAIDead[PersistentGameState.encounterID] = true;
+                Debug.Log("Marked overworld enemy " + PersistentGameState.encounterID + " as DEAD.");
+            }
+            else
+            {
+                Debug.Log("Combat was from a grave — NOT marking overworld enemies.");
+            }
+    }
+
+    // 2. Give XP
     PlayerStats.Instance.AddXP(5);
-    
+
+    // 3. Notify UI
     onEnemyDied?.Invoke();
     CombatManager.Instance.EnemyDied(this);
 
+    // 4. Destroy object in combat scene
     Destroy(gameObject);
 }
+
 public void SetTargetArrow(bool on)
 {
     if (targetArrow != null)

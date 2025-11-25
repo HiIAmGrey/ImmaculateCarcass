@@ -2,6 +2,8 @@ using UnityEngine;
 
 public static class PersistentGameState
 {
+    public static bool isOverworldEncounter = false;
+
     // keeping track of player stats we want to save
     public static int playerLevel = 1;
     public static int playerXP = 0;
