@@ -788,7 +788,6 @@ MonoBehaviour:
     type: 3}
   damageSpawnPoint: {fileID: 983300918}
   targetArrow: {fileID: 353737917}
-  combatCanvas: {fileID: 635876391}
 --- !u!1 &352613654
 GameObject:
   m_ObjectHideFlags: 0
@@ -2827,7 +2826,6 @@ MonoBehaviour:
     type: 3}
   damageSpawnPoint: {fileID: 738162116}
   targetArrow: {fileID: 857756476}
-  combatCanvas: {fileID: 635876391}
 --- !u!1 &1534214129
 GameObject:
   m_ObjectHideFlags: 0
@@ -3572,7 +3570,6 @@ MonoBehaviour:
     type: 3}
   damageSpawnPoint: {fileID: 1574614199}
   targetArrow: {fileID: 188809967}
-  combatCanvas: {fileID: 635876391}
 --- !u!1 &2033093520
 GameObject:
   m_ObjectHideFlags: 0
@@ -3865,6 +3862,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Arrow
+      objectReference: {fileID: 0}
+    - target: {fileID: 426597562900722980, guid: d5282dc6a2ef50840a97224de4d046d8,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7478396761419521159, guid: d5282dc6a2ef50840a97224de4d046d8,
         type: 3}
