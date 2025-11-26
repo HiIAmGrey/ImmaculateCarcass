@@ -9,10 +9,12 @@ public class DialogueManager : MonoBehaviour
     [Header("Dialogue UI")]
     public GameObject dialogueBox;
     public TMP_Text dialogueText;
-    public TMP_Text continueHint; // "Press SPACE to continue"
+    public TMP_Text continueHint;
 
     private Queue<string> lines = new Queue<string>();
     private bool dialogueActive = false;
+
+    private System.Action onDialogueFinished;
 
     void Awake()
     {
@@ -22,44 +24,48 @@ public class DialogueManager : MonoBehaviour
 
     void Update()
     {
-        // player presses SPACE to advance or close dialogue
         if (dialogueActive && Input.GetKeyDown(KeyCode.Space))
         {
             DisplayNextLine();
         }
     }
 
-    // start a dialogue with one or more lines
+    //  VERSION 1 — NO CALLBACK 
     public void ShowDialogue(params string[] dialogueLines)
     {
-        lines.Clear();
+        ShowDialogue(null, dialogueLines);
+    }
 
+    //  VERSION 2 — CALLBACK VERSION
+    public void ShowDialogue(System.Action finishedCallback, params string[] dialogueLines)
+    {
+        onDialogueFinished = finishedCallback;
+
+        lines.Clear();
         foreach (string line in dialogueLines)
             lines.Enqueue(line);
 
+        dialogueActive = true;
         dialogueBox.SetActive(true);
         continueHint.gameObject.SetActive(true);
 
-        dialogueActive = true;
-
-        // show first line immediately
         DisplayNextLine();
     }
 
     private void DisplayNextLine()
     {
-        // if we run out of lines, close the box
         if (lines.Count == 0)
         {
             HideDialogue();
+
+            // Run callback AFTER the dialogue ends
+            onDialogueFinished?.Invoke();
+            onDialogueFinished = null;
             return;
         }
 
-        // grab next line
         string nextLine = lines.Dequeue();
         dialogueText.text = nextLine;
-
-        // always show the continue hint so the player knows they can press SPACE
         continueHint.gameObject.SetActive(true);
     }
 

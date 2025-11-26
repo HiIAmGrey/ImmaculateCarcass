@@ -5,7 +5,7 @@ public class GraveDiggable : MonoBehaviour
 {
     private bool playerInRange = false;
 
-    public int graveID = 0; 
+    public int graveID = 0;
 
     private Renderer rend;
 
@@ -76,26 +76,38 @@ public class GraveDiggable : MonoBehaviour
         PersistentGameState.graveDug[graveID] = true;
         PersistentGameState.graveCount++;
 
-        NotificationManager.Instance.ShowNotification("You unearthed something...", 1.5f);
-
         // Visual change
         SetToDugAppearance();
 
-        // Begin encounter
-            // Graves use encounter IDs 0–99 to avoid collision with other encounters
-            PersistentGameState.isOverworldEncounter = false;
-            EnemyEncounterManager.SetEncounterID(10 + graveID);
+        // Play dialogue BEFORE combat
+        DialogueManager.Instance.ShowDialogue(
+            () =>
+            {
+                // This code runs AFTER the player presses SPACE to finish reading
 
-            // Save the player’s current position BEFORE combat
-            PersistentGameState.savedPlayerPos = 
-                GameObject.FindGameObjectWithTag("Player").transform.position;
+                // Graves use encounter IDs 10+
+                PersistentGameState.isOverworldEncounter = false;
+                EnemyEncounterManager.SetEncounterID(10 + graveID);
 
-            PersistentGameState.hasSavedPlayerPos = true;
+                // Save the player’s current position BEFORE combat
+                var player = GameObject.FindGameObjectWithTag("Player");
+                if (player != null)
+                {
+                    PersistentGameState.savedPlayerPos = player.transform.position;
+                    PersistentGameState.hasSavedPlayerPos = true;
+                }
 
-            // Save everything else
-            PersistentGameState.SaveFromGame();
+                // Save everything else
+                PersistentGameState.SaveFromGame();
 
-        SceneManager.LoadScene("CombatScene");
+                // Enter combat
+                SceneManager.LoadScene("CombatScene");
+            },
+
+            // Dialogue lines
+            "You disturb the silent soil...",
+            "Something stirs beneath the grave..."
+        );
     }
 
     private void SetToDugAppearance()
