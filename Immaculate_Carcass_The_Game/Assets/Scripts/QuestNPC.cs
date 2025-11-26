@@ -3,9 +3,14 @@ using UnityEngine;
 public class QuestNPC : MonoBehaviour
 {
     public enum QuestState { NotStarted, InProgress, Completed, FinalBattle }
-    public QuestState state = QuestState.NotStarted;
-
     public int gravesNeeded = 3;
+
+    private QuestNPC_Manager qm;
+
+    void Start()
+    {
+        qm = QuestNPC_Manager.Instance;
+    }
 
     void OnTriggerEnter(Collider other)
     {
@@ -14,14 +19,12 @@ public class QuestNPC : MonoBehaviour
         // Use the persistent grave count 
         int dug = PersistentGameState.graveCount;
 
+        QuestState state = (QuestState)qm.GetState();
+
         switch (state)
         {
-            
-            // FIRST TIME TALKING TO NPC
-            
             case QuestState.NotStarted:
 
-                // If no shovel yet
                 if (!PlayerInventory.Instance.hasShovel)
                 {
                     DialogueManager.Instance.ShowDialogue(
@@ -32,7 +35,6 @@ public class QuestNPC : MonoBehaviour
                     return;
                 }
 
-                // If shovel already collected
                 DialogueManager.Instance.ShowDialogue(
                     "Ah… a living soul wandering this rotted parcel of land.\n" +
                     "If it is purpose you seek, then listen well.\n\n" +
@@ -41,13 +43,9 @@ public class QuestNPC : MonoBehaviour
                     "Bring it to me, and I shall tell you why the dead whisper."
                 );
 
-                state = QuestState.InProgress;
+                qm.SetState((int)QuestState.InProgress);
                 break;
 
-
-            
-            // QUEST IN PROGRESS (GRAVE COUNT MATTERS)
-            
             case QuestState.InProgress:
 
                 if (!PlayerInventory.Instance.hasShovel)
@@ -89,15 +87,11 @@ public class QuestNPC : MonoBehaviour
                         "<color=#E47676>Bring them here, and let me gaze upon perfection.</color>"
                     );
 
-                    state = QuestState.Completed;
+                    qm.SetState((int)QuestState.Completed);
                 }
 
                 break;
 
-
-            
-            // NPC BETRAYAL SETUP
-            
             case QuestState.Completed:
 
                 DialogueManager.Instance.ShowDialogue(
@@ -106,13 +100,9 @@ public class QuestNPC : MonoBehaviour
                     "*The NPC’s posture straightens. His tone curdles.*"
                 );
 
-                state = QuestState.FinalBattle;
+                qm.SetState((int)QuestState.FinalBattle);
                 break;
 
-
-            
-            // FINAL BOSS FIGHT
-           
             case QuestState.FinalBattle:
 
                 DialogueManager.Instance.ShowDialogue(

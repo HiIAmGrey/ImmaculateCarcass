@@ -4,20 +4,28 @@ public class QuestNPC_Manager : MonoBehaviour
 {
     public static QuestNPC_Manager Instance;
 
-    public QuestNPC npc; 
+    // reminder that 0 = NotStarted, 1 = InProgress, 2 = Completed, 3 = FinalBattle
+    public int currentState = 0;
 
     void Awake()
     {
         Instance = this;
     }
 
-    public int GetState()
+    void Start()
     {
-        return (int)npc.state;
+        // Load previously saved quest state
+        currentState = PersistentGameState.questState;
     }
 
-    public void SetState(int s)
+    public int GetState()
     {
-        npc.state = (QuestNPC.QuestState)s;
+        return currentState;
+    }
+
+    public void SetState(int newState)
+    {
+        currentState = newState;
+        PersistentGameState.questState = newState;
     }
 }

@@ -53,6 +53,7 @@ public class PlayerStats : MonoBehaviour
         PersistentGameState.playerXP = xp;
         PersistentGameState.playerMaxHP = PlayerHealth.Instance.maxHealth;
         PersistentGameState.playerCurrentHP = PlayerHealth.Instance.currentHealth;
+        PersistentGameState.playerAttackDamage = PlayerCombat.Instance.attackDamage;
 
         Debug.Log("LEVEL UP! Now level " + level);
     }
