@@ -10,7 +10,7 @@ public class EnemyController : MonoBehaviour
     public System.Action onEnemyDied;
     public GameObject targetArrow;
 
-    public Canvas combatCanvas; 
+    
 
 public void TakeDamage(int dmg)
 {
