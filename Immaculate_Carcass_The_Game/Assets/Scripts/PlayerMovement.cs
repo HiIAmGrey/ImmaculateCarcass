@@ -5,7 +5,7 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Movement Settings")]
     public float moveSpeed = 5f;
-    public float stopDistance = 0.1f;
+    public float stopDistance = 0.3f;
 
     [Header("Combat Trigger Settings")]
     public float stopBeforeEnemy = 2f;          // how far to stop from enemy visually
@@ -24,6 +24,9 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        // Debugging animation state
+         if (anim != null)
+        Debug.Log("isMoving parameter = " + anim.GetBool("isMoving"));
         // Detect left click
         if (Input.GetMouseButtonDown(0))
         {

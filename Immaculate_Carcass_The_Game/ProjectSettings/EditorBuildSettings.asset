@@ -15,7 +15,19 @@ EditorBuildSettings:
     path: Assets/Scenes/GameScene.unity
     guid: 29a12ac2ad30d414abd89ab8d7c32fd5
   - enabled: 1
-    path: Assets/Scenes/CombatScenes/CombatScene.unity
+    path: Assets/Scenes/CombatScenes/CombatScene_BigUgly.unity
     guid: 955d7fa4321044c4cbdae1f91041865a
+  - enabled: 1
+    path: Assets/Scenes/CombatScenes/CombatScene_FinalBoss.unity
+    guid: 3aaec555615036847bfa42629a49f420
+  - enabled: 1
+    path: Assets/Scenes/CombatScenes/CombatScene_Grave0.unity
+    guid: e3e669c98b1701b43b6c8779b3f41ef2
+  - enabled: 1
+    path: Assets/Scenes/CombatScenes/CombatScene_Grave1.unity
+    guid: c93f9ea2ae927e944ae1ecf03aa45736
+  - enabled: 1
+    path: Assets/Scenes/CombatScenes/CombatScene_Grave2.unity
+    guid: daf77d00eb45c6f4880f1bea3f2f2640
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
