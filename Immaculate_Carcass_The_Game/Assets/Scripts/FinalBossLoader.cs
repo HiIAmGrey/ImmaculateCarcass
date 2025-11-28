@@ -18,7 +18,7 @@ public static class FinalBossLoader
                 PersistentGameState.SaveFromGame();
 
                 // Load combat scene
-                SceneManager.LoadScene("CombatScene");
+                SceneManager.LoadScene("CombatScene_FinalBoss");
             },
 
             // Dialogue lines before the final boss battle

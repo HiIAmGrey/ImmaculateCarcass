@@ -15,7 +15,7 @@ EditorBuildSettings:
     path: Assets/Scenes/GameScene.unity
     guid: 29a12ac2ad30d414abd89ab8d7c32fd5
   - enabled: 1
-    path: Assets/Scenes/CombatScene.unity
+    path: Assets/Scenes/CombatScenes/CombatScene.unity
     guid: 955d7fa4321044c4cbdae1f91041865a
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

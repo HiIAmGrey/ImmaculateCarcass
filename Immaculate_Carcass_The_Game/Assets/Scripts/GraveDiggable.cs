@@ -79,17 +79,19 @@ public class GraveDiggable : MonoBehaviour
         // Visual change
         SetToDugAppearance();
 
-        // Play dialogue BEFORE combat
+        // Show digging dialogue BEFORE combat
         DialogueManager.Instance.ShowDialogue(
             () =>
             {
-                // This code runs AFTER the player presses SPACE to finish reading
+                // After dialogue finishes:
 
-                // Graves use encounter IDs 10+
+                // Mark this is NOT an overworld AI encounter
                 PersistentGameState.isOverworldEncounter = false;
+
+                // Use encounter IDs 10+ for graves
                 EnemyEncounterManager.SetEncounterID(10 + graveID);
 
-                // Save the player’s current position BEFORE combat
+                // Save the player position before combat
                 var player = GameObject.FindGameObjectWithTag("Player");
                 if (player != null)
                 {
@@ -97,11 +99,11 @@ public class GraveDiggable : MonoBehaviour
                     PersistentGameState.hasSavedPlayerPos = true;
                 }
 
-                // Save everything else
+                // Save all game data
                 PersistentGameState.SaveFromGame();
 
-                // Enter combat
-                SceneManager.LoadScene("CombatScene");
+                // Load unique combat scene for THIS grave
+                SceneManager.LoadScene($"CombatScene_Grave{graveID}");
             },
 
             // Dialogue lines

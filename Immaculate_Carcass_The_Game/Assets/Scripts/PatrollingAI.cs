@@ -149,7 +149,7 @@ public class PatrollingAI : MonoBehaviour
             EnemyEncounterManager.SetEncounterID(aiID);
 
             // Load combat
-            SceneManager.LoadScene("CombatScene");
+            SceneManager.LoadScene("CombatScene_BigUgly");
             return;
         }
 
