@@ -5,7 +5,7 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Movement Settings")]
     public float moveSpeed = 5f;
-    public float stopDistance = 0.3f;
+    public float stopDistance = 0.1f;
 
     [Header("Combat Trigger Settings")]
     public float stopBeforeEnemy = 2f;          // how far to stop from enemy visually
@@ -81,19 +81,31 @@ public class PlayerController : MonoBehaviour
     }
 
     void MovePlayer()
+{
+    Vector3 direction = (targetPosition - transform.position);
+    direction.y = 0;
+
+    // If we're basically already at the target, stop moving
+    if (direction.sqrMagnitude < stopDistance * stopDistance)
     {
-        Vector3 direction = (targetPosition - transform.position).normalized;
-        direction.y = 0;
-
-        if (direction != Vector3.zero)
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), 0.15f);
-
-        transform.position += direction * moveSpeed * Time.deltaTime;
-
-        if (Vector3.Distance(transform.position, targetPosition) < stopDistance)
-        {
-            moving = false;
-            if (anim) anim.SetBool("isMoving", false);
-        }
+        moving = false;
+        if (anim) anim.SetBool("isMoving", false);
+        return;
     }
+
+    // Normalize after checking distance
+    direction = direction.normalized;
+
+    // Rotate toward direction
+    if (direction != Vector3.zero)
+        transform.rotation = Quaternion.Slerp(
+            transform.rotation,
+            Quaternion.LookRotation(direction),
+            0.15f
+        );
+
+    // Apply movement
+    transform.position += direction * moveSpeed * Time.deltaTime;
+}
+
 }
