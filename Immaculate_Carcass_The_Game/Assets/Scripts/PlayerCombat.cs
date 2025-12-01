@@ -68,41 +68,43 @@ public class PlayerCombat : MonoBehaviour
     //---------------------------------------
     // ARCANE BOLT (single-target ranged spell)
     //---------------------------------------
-    public void CastArcaneBolt()
+public void CastArcaneBolt()
+{
+    if (TurnManager.Instance.state != TurnState.PlayerTurn)
+        return;
+
+    var enemy = CombatManager.Instance.GetSelectedEnemy();
+    if (enemy == null)
     {
-        if (TurnManager.Instance.state != TurnState.PlayerTurn)
-            return;
-
-        var enemy = CombatManager.Instance.GetSelectedEnemy();
-        if (enemy == null)
-        {
-            Debug.Log("Tried to cast Arcane Bolt but no enemy selected!");
-            return;
-        }
-
-        if (spellSpawnPoint == null)
-        {
-            Debug.LogError("SpellSpawnPoint is NOT assigned on PlayerCombat!");
-            return;
-        }
-
-        // simple stat scaling: base + level
-        int finalDamage = arcaneBoltBaseDamage + PlayerStats.Instance.level;
-
-        // spawn the projectile at the staff tip
-        GameObject boltObj = Instantiate(
-            arcaneBoltPrefab,
-            spellSpawnPoint.position,
-            Quaternion.identity
-        );
-
-        ArcaneBoltProjectile bolt = boltObj.GetComponent<ArcaneBoltProjectile>();
-
-        // assign target + damage
-        bolt.Initialize(enemy.transform, finalDamage);
-
-        Debug.Log($"Cast Arcane Bolt on {enemy.name} for {finalDamage} damage.");
-
-        TurnManager.Instance.EndPlayerTurn();
+        Debug.Log("Tried to cast Arcane Bolt but no enemy selected!");
+        return;
     }
+
+    if (spellSpawnPoint == null)
+    {
+        Debug.LogError("SpellSpawnPoint is NOT assigned on PlayerCombat!");
+        return;
+    }
+
+    // play spell-casting animation
+    anim.SetTrigger("SpellAttack");
+
+    // simple stat scaling: base + level
+    int finalDamage = arcaneBoltBaseDamage + PlayerStats.Instance.level;
+
+    // spawn the projectile at the staff tip
+    GameObject boltObj = Instantiate(
+        arcaneBoltPrefab,
+        spellSpawnPoint.position,
+        Quaternion.identity
+    );
+
+    ArcaneBoltProjectile bolt = boltObj.GetComponent<ArcaneBoltProjectile>();
+    bolt.Initialize(enemy.transform, finalDamage);
+
+    Debug.Log($"Cast Arcane Bolt on {enemy.name} for {finalDamage} damage.");
+
+    TurnManager.Instance.EndPlayerTurn();
+}
+
 }
