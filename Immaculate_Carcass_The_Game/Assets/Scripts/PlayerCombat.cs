@@ -9,102 +9,103 @@ public class PlayerCombat : MonoBehaviour
     public bool isGuarding = false;
 
     [Header("Spell Settings")]
-    public GameObject arcaneBoltPrefab;   // prefab for Arcane Bolt
-    public Transform spellSpawnPoint;     // empty placed at the staff tip
-    public int arcaneBoltBaseDamage = 6;  // base spell damage before scaling
+    public GameObject arcaneBoltPrefab;
+    public Transform spellSpawnPoint;
+    public int arcaneBoltBaseDamage = 6;
 
-    private Animator anim;                // cached so animation triggers are clean
+    [Header("Shield Spell")]
+    public GameObject arcaneShieldPrefab;
+    public float shieldPercentage = 0.08f;
+
+    private GameObject activeShield;
+    private Animator anim;
 
     void Awake()
     {
         Instance = this;
-
-        // animator lives on MageRoot
         anim = GetComponent<Animator>();
-
-        Debug.Log("PlayerCombat Awake — CombatManager: " + CombatManager.Instance);
     }
 
     void Start()
     {
-        // load saved attack damage
         attackDamage = PersistentGameState.playerAttackDamage;
     }
 
-    //---------------------------------------
-    // Basic Melee Attack
-    //---------------------------------------
     public void Attack()
     {
         if (TurnManager.Instance.state != TurnState.PlayerTurn)
             return;
 
-        // play melee animation
         anim.SetTrigger("MeleeAttack");
 
         var enemy = CombatManager.Instance.GetSelectedEnemy();
-        Debug.Log("Selected enemy for melee = " + enemy);
-
         if (enemy != null)
             enemy.TakeDamage(attackDamage);
 
         TurnManager.Instance.EndPlayerTurn();
     }
 
-    //---------------------------------------
-    // Guard (reduces incoming damage this turn)
-    //---------------------------------------
     public void Guard()
     {
         if (TurnManager.Instance.state != TurnState.PlayerTurn)
             return;
 
         isGuarding = true;
-        Debug.Log("Player is guarding.");
+        TurnManager.Instance.EndPlayerTurn();
+    }
+
+    public void CastArcaneBolt()
+    {
+        if (TurnManager.Instance.state != TurnState.PlayerTurn)
+            return;
+
+        var enemy = CombatManager.Instance.GetSelectedEnemy();
+        if (enemy == null) return;
+
+        anim.SetTrigger("SpellAttack");
+
+        int finalDamage = arcaneBoltBaseDamage + PlayerStats.Instance.level;
+
+        GameObject boltObj = Instantiate(arcaneBoltPrefab, spellSpawnPoint.position, Quaternion.identity);
+        boltObj.GetComponent<ArcaneBoltProjectile>().Initialize(enemy.transform, finalDamage);
 
         TurnManager.Instance.EndPlayerTurn();
     }
 
-    //---------------------------------------
-    // ARCANE BOLT (single-target ranged spell)
-    //---------------------------------------
-public void CastArcaneBolt()
-{
-    if (TurnManager.Instance.state != TurnState.PlayerTurn)
-        return;
-
-    var enemy = CombatManager.Instance.GetSelectedEnemy();
-    if (enemy == null)
+    public void CastArcaneShield()
     {
-        Debug.Log("Tried to cast Arcane Bolt but no enemy selected!");
-        return;
+        if (TurnManager.Instance.state != TurnState.PlayerTurn) return;
+
+        var hp = PlayerHealth.Instance;
+
+        if (hp.arcaneShieldCooldown > 0)
+        {
+            Debug.Log("Arcane Shield on cooldown!");
+            return;
+        }
+
+        anim.SetTrigger("SpellAttack");
+
+        int shieldValue = Mathf.RoundToInt(hp.maxHealth * shieldPercentage);
+        hp.shieldAmount = shieldValue;
+        hp.shieldTurnsRemaining = 2;
+        hp.arcaneShieldCooldown = 3;
+
+        if (activeShield != null)
+            Destroy(activeShield);
+
+        activeShield = Instantiate(arcaneShieldPrefab, transform.position, Quaternion.identity, transform);
+
+        Debug.Log($"Shield applied: {shieldValue} for 2 turns.");
+
+        TurnManager.Instance.EndPlayerTurn();
     }
 
-    if (spellSpawnPoint == null)
+    public void DestroyShieldFX()
     {
-        Debug.LogError("SpellSpawnPoint is NOT assigned on PlayerCombat!");
-        return;
+        if (activeShield != null)
+            Destroy(activeShield);
+
+        activeShield = null;
     }
-
-    // play spell-casting animation
-    anim.SetTrigger("SpellAttack");
-
-    // simple stat scaling: base + level
-    int finalDamage = arcaneBoltBaseDamage + PlayerStats.Instance.level;
-
-    // spawn the projectile at the staff tip
-    GameObject boltObj = Instantiate(
-        arcaneBoltPrefab,
-        spellSpawnPoint.position,
-        Quaternion.identity
-    );
-
-    ArcaneBoltProjectile bolt = boltObj.GetComponent<ArcaneBoltProjectile>();
-    bolt.Initialize(enemy.transform, finalDamage);
-
-    Debug.Log($"Cast Arcane Bolt on {enemy.name} for {finalDamage} damage.");
-
-    TurnManager.Instance.EndPlayerTurn();
-}
-
 }

@@ -4,11 +4,13 @@ using TMPro;
 
 public class PlayerHealth : MonoBehaviour
 {
-    [Header("Health Settings")]
-    public int maxHealth = 100;
-    public int currentHealth;
-    private float smoothFill;
     public static PlayerHealth Instance;
+
+    [Header("Health Settings")]
+    public int maxHealth = 20;
+    public int currentHealth = 20;
+
+    private float smoothFill = 1f;
 
     [Header("UI Elements")]
     public Image hpFill;           
@@ -16,47 +18,140 @@ public class PlayerHealth : MonoBehaviour
     public Transform damageSpawnPoint;
     public GameObject playerDamagePrefab;
 
+    [Header("Arcane Shield")]
+    public int shieldAmount = 0;
+    public int shieldTurnsRemaining = 0;
+    public int arcaneShieldCooldown = 0;
+
+    // ============================
+    // LIFECYCLE
+    // ============================
+    void Awake()
+    {
+        Instance = this;
+    }
+
     void Start()
     {
-        // set global reference
-        Instance = this;
-
-        // load from persistent state (or defaults on new game)
+        // Load HP from persistent system
         maxHealth = PersistentGameState.playerMaxHP;
         currentHealth = PersistentGameState.playerCurrentHP;
 
-        // correct fill state
-        if (maxHealth > 0)
-            smoothFill = (float)currentHealth / maxHealth;
-        else
-            smoothFill = 1f;
+        if (maxHealth <= 0)
+            maxHealth = 20;
 
+        smoothFill = (float)currentHealth / maxHealth;
         UpdateHealthUI();
     }
 
     void Update()
     {
         UpdateHealthUI();
-
-        // Test controls
-        if (Input.GetKeyDown(KeyCode.Space))
-            TakeDamage(10);
-
-        if (Input.GetKeyDown(KeyCode.H))
-            Heal(10);
     }
 
+    // ============================
+    // DAMAGE
+    // ============================
     public void TakeDamage(int amount)
     {
-        currentHealth -= amount;
-        if (currentHealth < 0)
-            currentHealth = 0;
+        Debug.Log("PlayerHealth.TakeDamage CALLED => " + amount);
 
-        // save updated HP to persistent system
+        // ----------------------------------------
+        // GUARD DAMAGE REDUCTION
+        // ----------------------------------------
+        if (PlayerCombat.Instance.isGuarding)
+        {
+            amount = Mathf.RoundToInt(amount * 0.5f);
+            PlayerCombat.Instance.isGuarding = false;
+            Debug.Log("Guard reduced damage to: " + amount);
+        }
+
+        // ----------------------------------------
+        // SHIELD ABSORPTION
+        // ----------------------------------------
+        if (shieldAmount > 0)
+        {
+            int absorbed = Mathf.Min(shieldAmount, amount);
+            shieldAmount -= absorbed;
+            amount -= absorbed;
+
+            Debug.Log($"Shield absorbed {absorbed}. Remaining shield: {shieldAmount}");
+
+            if (shieldAmount <= 0)
+            {
+                shieldAmount = 0;
+                shieldTurnsRemaining = 0;
+                PlayerCombat.Instance.DestroyShieldFX();
+                Debug.Log("Shield broke!");
+            }
+
+            if (amount <= 0)
+            {
+                SpawnDamageText(absorbed);
+                return;
+            }
+        }
+
+        // ----------------------------------------
+        // APPLY HP DAMAGE
+        // ----------------------------------------
+        currentHealth -= amount;
+
+        // persistent save
         PersistentGameState.playerCurrentHP = currentHealth;
         PersistentGameState.playerMaxHP = maxHealth;
 
-        // spawn floating damage UI
+        SpawnDamageText(amount);
+
+        if (currentHealth <= 0)
+        {
+            currentHealth = 0;
+            Die();
+        }
+
+        UpdateHealthUI();
+    }
+
+    // ============================
+    // HEALING
+    // ============================
+    public void Heal(int amount)
+    {
+        currentHealth += amount;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+
+        PersistentGameState.playerCurrentHP = currentHealth;
+        PersistentGameState.playerMaxHP = maxHealth;
+
+        UpdateHealthUI();
+    }
+
+    // ============================
+    // UI UPDATE
+    // ============================
+    private void UpdateHealthUI()
+    {
+        if (hpFill != null)
+        {
+            float targetFill = (float)currentHealth / maxHealth;
+            smoothFill = Mathf.Lerp(smoothFill, targetFill, Time.deltaTime * 12f);
+            hpFill.fillAmount = smoothFill;
+
+            // HP color gradient
+            Color healthy = new Color(0.5f, 0f, 0f);
+            Color dying   = new Color(0.15f, 0f, 0f);
+            hpFill.color = Color.Lerp(dying, healthy, smoothFill);
+        }
+
+        if (hpText != null)
+            hpText.text = $"{currentHealth}/{maxHealth}";
+    }
+
+    // ============================
+    // DAMAGE FLOATING TEXT
+    // ============================
+    private void SpawnDamageText(int amount)
+    {
         if (playerDamagePrefab != null && damageSpawnPoint != null)
         {
             Vector3 screenPos = Camera.main.WorldToScreenPoint(damageSpawnPoint.position);
@@ -71,49 +166,14 @@ public class PlayerHealth : MonoBehaviour
 
             dmgObj.GetComponent<FloatingDamage>().ShowDamage(amount);
         }
-
-        // update HUD
-        UpdateHealthUI();
-
-        // handle death if needed (not implemented yet)
     }
 
-
-    public void Heal(int amount)
+    // ============================
+    // DEATH
+    // ============================
+    void Die()
     {
-        currentHealth += amount;
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-
-        // save persistent health
-        PersistentGameState.playerCurrentHP = currentHealth;
-        PersistentGameState.playerMaxHP = maxHealth;
-    }
-
-    private void UpdateHealthUI()
-    {
-        if (hpFill != null)
-        {
-            float targetFill = (float)currentHealth / maxHealth;
-            smoothFill = Mathf.Lerp(smoothFill, targetFill, Time.deltaTime * 15f);
-            hpFill.fillAmount = smoothFill;
-
-            // HP Color Change 
-            Color healthy = new Color(0.5f, 0f, 0f);   
-            Color dying = new Color(0.15f, 0f, 0f);   
-            Color currentColor = Color.Lerp(dying, healthy, smoothFill);
-
-            // Low-HP pulsing 
-            if (smoothFill < 0.3f)
-            {
-                float pulse = Mathf.Sin(Time.time * 6f) * 0.25f + 0.75f;
-                currentColor *= pulse;
-            }
-
-            hpFill.color = currentColor;
-        }
-
-        // Update HP Text
-        if (hpText != null)
-            hpText.text = $"{currentHealth}/{maxHealth}";
+        Debug.Log("Player died.");
+        // Add death animation, scene transitions, etc.
     }
 }
