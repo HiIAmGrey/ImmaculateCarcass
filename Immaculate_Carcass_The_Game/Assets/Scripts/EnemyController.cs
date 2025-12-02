@@ -41,6 +41,17 @@ public class EnemyController : MonoBehaviour
         enemyHealth -= dmg;
         if (enemyHealth < 0) enemyHealth = 0;
 
+         // Eyeball Hit Anim
+       if (anim != null)
+{
+    // Only play Hit trigger if it exists
+    if (anim.runtimeAnimatorController != null &&
+        HasParameter(anim, "Hit", AnimatorControllerParameterType.Trigger))
+    {
+        anim.SetTrigger("Hit");
+    }
+}
+
         // Update UI
         onEnemyDamaged?.Invoke();
 
@@ -95,4 +106,14 @@ public class EnemyController : MonoBehaviour
         if (targetArrow != null)
             targetArrow.SetActive(on);
     }
+    private bool HasParameter(Animator animator, string paramName, AnimatorControllerParameterType type)
+        {
+            foreach (AnimatorControllerParameter param in animator.parameters)
+            {
+                if (param.type == type && param.name == paramName)
+                    return true;
+            }
+            return false;
+        }
+
 }
