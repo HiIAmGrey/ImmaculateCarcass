@@ -144,6 +144,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acebdacde02a936438782f39a4c5d843, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShovelPickup
+  shovelPickupSFX: {fileID: 8300000, guid: 53e877995f1e60546a25cb8af1190b2a, type: 3}
 --- !u!136 &132127894
 CapsuleCollider:
   m_ObjectHideFlags: 0

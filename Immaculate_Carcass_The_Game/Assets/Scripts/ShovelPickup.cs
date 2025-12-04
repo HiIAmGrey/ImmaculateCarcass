@@ -2,28 +2,24 @@ using UnityEngine;
 
 public class ShovelPickup : MonoBehaviour
 {
+    [Header("Pickup Settings")]
+    public AudioClip shovelPickupSFX;   // sound that plays when grabbing the shovel
+
     private bool playerInRange = false;
-    
+
     void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("Player")) return;
+        if (!other.CompareTag("Player"))
+            return;
 
         playerInRange = true;
+        UIInteractionPrompt.Instance.ShowPrompt("Press E to pick up shovel");
+    }
 
-        UIInteractionPrompt.Instance.ShowPrompt("Press E to pick up the shovel");
-    }
-   void Start()
-    {
-        // if the player already picked up the shovel before
-        // this world object shouldn't exist anymore
-        if (PersistentGameState.hasShovel)
-        {
-            gameObject.SetActive(false);
-        }
-    }
     void OnTriggerExit(Collider other)
     {
-        if (!other.CompareTag("Player")) return;
+        if (!other.CompareTag("Player"))
+            return;
 
         playerInRange = false;
         UIInteractionPrompt.Instance.HidePrompt();
@@ -31,18 +27,28 @@ public class ShovelPickup : MonoBehaviour
 
     void Update()
     {
-        if (playerInRange && Input.GetKeyDown(KeyCode.E))
+        if (!playerInRange)
+            return;
+
+        if (Input.GetKeyDown(KeyCode.E))
         {
-            // playergets the shovel
-            PlayerInventory.Instance.PickUpShovel();
-            // Hide the prompt
-            UIInteractionPrompt.Instance.HidePrompt();
-
-            // Show notification
-            NotificationManager.Instance.ShowNotification("Shovel acquired!", 1.5f);
-
-            // hide the shovel
-            gameObject.SetActive(false);
+            PickupShovel();
         }
+    }
+
+    void PickupShovel()
+    {
+        // actually give the shovel to the player
+        PlayerInventory.Instance.hasShovel = true;
+
+        // play pickup sound (simple and clean)
+        if (shovelPickupSFX != null)
+            AudioManager.Instance.PlaySFX(shovelPickupSFX);
+
+        // hide interaction prompt
+        UIInteractionPrompt.Instance.HidePrompt();
+
+        // remove the shovel object from the world
+        Destroy(gameObject);
     }
 }
