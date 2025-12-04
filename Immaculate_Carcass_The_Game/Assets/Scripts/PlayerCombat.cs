@@ -11,18 +11,26 @@ public class PlayerCombat : MonoBehaviour
     public float critMultiplier = 1.5f;
     public bool isGuarding = false;
 
+    [Header("Basic Attack SFX")]
+    public AudioClip attackSFX;
+
     [Header("Spell Settings")]
     public GameObject arcaneBoltPrefab;
     public Transform spellSpawnPoint;
     public int arcaneBoltBaseDamage = 6;
-    [Header("Spell Variance")]
-    public int spellVariance = 2;
-    public float spellCritChance = 0.08f;
-    public float spellCritMultiplier = 1.6f;
+
+    [Header("Spell SFX")]
+    public AudioClip arcaneBoltSFX;
 
     [Header("Shield Spell")]
     public GameObject arcaneShieldPrefab;
     public float shieldPercentage = 0.08f;
+
+    [Header("Shield SFX")]
+    public AudioClip shieldSFX;
+
+    [Header("Guard SFX")]
+    public AudioClip guardSFX;
 
     private GameObject activeShield;
     private Animator anim;
@@ -35,7 +43,6 @@ public class PlayerCombat : MonoBehaviour
 
     void Start()
     {
-        // Load the leveled attack stat
         attackDamage = PersistentGameState.playerAttackDamage;
     }
 
@@ -46,14 +53,16 @@ public class PlayerCombat : MonoBehaviour
 
         anim.SetTrigger("MeleeAttack");
 
+        // play attack sound
+        if (attackSFX != null)
+            AudioManager.Instance.PlaySFX(attackSFX);
+
         var enemy = CombatManager.Instance.GetSelectedEnemy();
         if (enemy != null)
         {
-            // Damage variance
             int dmg = attackDamage + Random.Range(-damageVariance, damageVariance + 1);
             if (dmg < 1) dmg = 1;
 
-            // Critical hit
             if (Random.value < critChance)
             {
                 dmg = Mathf.RoundToInt(dmg * critMultiplier);
@@ -72,43 +81,46 @@ public class PlayerCombat : MonoBehaviour
             return;
 
         isGuarding = true;
+
+        // play guard sound
+        if (guardSFX != null)
+            AudioManager.Instance.PlaySFX(guardSFX);
+
         TurnManager.Instance.EndPlayerTurn();
     }
 
-   public void CastArcaneBolt()
-        {
-            if (TurnManager.Instance.state != TurnState.PlayerTurn)
-                return;
+    public void CastArcaneBolt()
+    {
+        if (TurnManager.Instance.state != TurnState.PlayerTurn)
+            return;
 
-            var enemy = CombatManager.Instance.GetSelectedEnemy();
-            if (enemy == null) return;
+        anim.SetTrigger("SpellAttack");
 
-            anim.SetTrigger("SpellAttack");
+        // play arcane bolt sound
+        if (arcaneBoltSFX != null)
+            AudioManager.Instance.PlaySFX(arcaneBoltSFX);
 
-            // Base damage including level scaling
-            int dmg = arcaneBoltBaseDamage + PlayerStats.Instance.level;
+        var enemy = CombatManager.Instance.GetSelectedEnemy();
+        if (enemy == null) return;
 
-            // Apply spell variance
-            dmg += Random.Range(-spellVariance, spellVariance + 1);
-            if (dmg < 1) dmg = 1;
+        int finalDamage = arcaneBoltBaseDamage + PlayerStats.Instance.level;
 
-            // Spell critical hit
-            if (Random.value < spellCritChance)
-            {
-                dmg = Mathf.RoundToInt(dmg * spellCritMultiplier);
-                Debug.Log("SPELL CRITICAL HIT!");
-            }
+        GameObject boltObj = Instantiate(arcaneBoltPrefab, spellSpawnPoint.position, Quaternion.identity);
+        boltObj.GetComponent<ArcaneBoltProjectile>().Initialize(enemy.transform, finalDamage);
 
-            GameObject boltObj = Instantiate(arcaneBoltPrefab, spellSpawnPoint.position, Quaternion.identity);
-            boltObj.GetComponent<ArcaneBoltProjectile>().Initialize(enemy.transform, dmg);
-
-            TurnManager.Instance.EndPlayerTurn();
-        }
-
+        TurnManager.Instance.EndPlayerTurn();
+    }
 
     public void CastArcaneShield()
     {
-        if (TurnManager.Instance.state != TurnState.PlayerTurn) return;
+        if (TurnManager.Instance.state != TurnState.PlayerTurn)
+            return;
+
+        anim.SetTrigger("SpellAttack");
+
+        // play shield sound
+        if (shieldSFX != null)
+            AudioManager.Instance.PlaySFX(shieldSFX);
 
         var hp = PlayerHealth.Instance;
 
@@ -117,8 +129,6 @@ public class PlayerCombat : MonoBehaviour
             Debug.Log("Arcane Shield on cooldown!");
             return;
         }
-
-        anim.SetTrigger("SpellAttack");
 
         int shieldValue = Mathf.RoundToInt(hp.maxHealth * shieldPercentage);
         hp.shieldAmount = shieldValue;

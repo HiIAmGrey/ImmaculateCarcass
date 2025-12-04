@@ -1337,6 +1337,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GraveDiggable
   graveID: 1
+  digSFX: {fileID: 0}
 --- !u!1001 &524734423
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2103,6 +2104,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GraveDiggable
   graveID: 2
+  digSFX: {fileID: 0}
 --- !u!1 &922538863
 GameObject:
   m_ObjectHideFlags: 0
@@ -2968,6 +2970,74 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d5282dc6a2ef50840a97224de4d046d8, type: 3}
+--- !u!1001 &1399320301
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2138894968605253578, guid: 75f351b32b3ff4c489d9c426eac14b24,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2332.2751
+      objectReference: {fileID: 0}
+    - target: {fileID: 2138894968605253578, guid: 75f351b32b3ff4c489d9c426eac14b24,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 181.13976
+      objectReference: {fileID: 0}
+    - target: {fileID: 2138894968605253578, guid: 75f351b32b3ff4c489d9c426eac14b24,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 535.00995
+      objectReference: {fileID: 0}
+    - target: {fileID: 2138894968605253578, guid: 75f351b32b3ff4c489d9c426eac14b24,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2138894968605253578, guid: 75f351b32b3ff4c489d9c426eac14b24,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2138894968605253578, guid: 75f351b32b3ff4c489d9c426eac14b24,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2138894968605253578, guid: 75f351b32b3ff4c489d9c426eac14b24,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2138894968605253578, guid: 75f351b32b3ff4c489d9c426eac14b24,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2138894968605253578, guid: 75f351b32b3ff4c489d9c426eac14b24,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2138894968605253578, guid: 75f351b32b3ff4c489d9c426eac14b24,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5334434244603641769, guid: 75f351b32b3ff4c489d9c426eac14b24,
+        type: 3}
+      propertyPath: m_Name
+      value: AudioManager
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 75f351b32b3ff4c489d9c426eac14b24, type: 3}
 --- !u!1 &1426836732
 GameObject:
   m_ObjectHideFlags: 0
@@ -3616,6 +3686,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8910686909516679807, guid: b18229435a2d0d64e88981c5f9ce9840,
+        type: 3}
+      propertyPath: guardSFX
+      value: 
+      objectReference: {fileID: 8300000, guid: bbcc1a9a78ee0484b95d6cc1de2ae22c, type: 3}
+    - target: {fileID: 8910686909516679807, guid: b18229435a2d0d64e88981c5f9ce9840,
+        type: 3}
+      propertyPath: attackSFX
+      value: 
+      objectReference: {fileID: 8300000, guid: 1931a108a72f50c46a6bd892ee057840, type: 3}
+    - target: {fileID: 8910686909516679807, guid: b18229435a2d0d64e88981c5f9ce9840,
+        type: 3}
+      propertyPath: shieldSFX
+      value: 
+      objectReference: {fileID: 8300000, guid: 7017891b6d9d3524298b190757f10015, type: 3}
+    - target: {fileID: 8910686909516679807, guid: b18229435a2d0d64e88981c5f9ce9840,
+        type: 3}
+      propertyPath: arcaneBoltSFX
+      value: 
+      objectReference: {fileID: 8300000, guid: 6d1aa70da4eafb0418ace96b1dc6b376, type: 3}
     - target: {fileID: 8910686909516679807, guid: b18229435a2d0d64e88981c5f9ce9840,
         type: 3}
       propertyPath: spellSpawnPoint
@@ -4752,6 +4842,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GraveDiggable
   graveID: 0
+  digSFX: {fileID: 0}
 --- !u!1 &2056224713
 GameObject:
   m_ObjectHideFlags: 0
@@ -5133,3 +5224,4 @@ SceneRoots:
   - {fileID: 2042597275}
   - {fileID: 1986280414}
   - {fileID: 208622642}
+  - {fileID: 1399320301}
