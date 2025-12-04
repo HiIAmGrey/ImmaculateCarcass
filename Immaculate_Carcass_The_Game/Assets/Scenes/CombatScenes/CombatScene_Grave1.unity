@@ -2066,12 +2066,6 @@ Transform:
   - {fileID: 2785661000091935052}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &819649600 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8257648579937585071, guid: b18229435a2d0d64e88981c5f9ce9840,
-    type: 3}
-  m_PrefabInstance: {fileID: 1507606415}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &898947156 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8360162573598822740, guid: fea382c8fd0834b4fa2cbcd573c40e32,
@@ -2297,7 +2291,7 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 1507606415}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1599929945}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f62c3f20d7bdc8749b16343003ce084b, type: 3}
@@ -3744,6 +3738,16 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7089870324256161403, guid: b18229435a2d0d64e88981c5f9ce9840,
+        type: 3}
+      propertyPath: hpFill
+      value: 
+      objectReference: {fileID: 1208601339}
+    - target: {fileID: 7089870324256161403, guid: b18229435a2d0d64e88981c5f9ce9840,
+        type: 3}
+      propertyPath: hpText
+      value: 
+      objectReference: {fileID: 1486103925}
     - target: {fileID: 7506953043855947198, guid: b18229435a2d0d64e88981c5f9ce9840,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3834,11 +3838,7 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1547838809}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1934752845755391133, guid: b18229435a2d0d64e88981c5f9ce9840,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1599929952}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b18229435a2d0d64e88981c5f9ce9840, type: 3}
 --- !u!1001 &1515589087
 PrefabInstance:
@@ -4240,40 +4240,12 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1584180883}
   m_CullTransparentMesh: 1
---- !u!1 &1599929945 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1934752845755391133, guid: b18229435a2d0d64e88981c5f9ce9840,
-    type: 3}
-  m_PrefabInstance: {fileID: 1507606415}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1599929951 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7506953043855947198, guid: b18229435a2d0d64e88981c5f9ce9840,
     type: 3}
   m_PrefabInstance: {fileID: 1507606415}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1599929952
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1599929945}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b73944cefdda2164fa14c80b635ef574, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
-  maxHealth: 20
-  currentHealth: 20
-  hpFill: {fileID: 1208601339}
-  hpText: {fileID: 1486103925}
-  damageSpawnPoint: {fileID: 819649600}
-  playerDamagePrefab: {fileID: 7469945538737787350, guid: e3641cc4911ebe144ab09bd54c4978e8,
-    type: 3}
-  shieldAmount: 0
-  shieldTurnsRemaining: 0
-  arcaneShieldCooldown: 0
 --- !u!1 &1763570757
 GameObject:
   m_ObjectHideFlags: 0

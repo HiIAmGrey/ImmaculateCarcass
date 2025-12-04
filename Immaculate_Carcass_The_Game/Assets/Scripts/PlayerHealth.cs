@@ -23,6 +23,10 @@ public class PlayerHealth : MonoBehaviour
     public int shieldTurnsRemaining = 0;
     public int arcaneShieldCooldown = 0;
 
+    [Header("Damage SFX (multiple clips)")]
+    public AudioClip[] playerDamageSounds;  
+    // will randomly pick one when the player gets hurt
+
     // ============================
     // LIFECYCLE
     // ============================
@@ -103,6 +107,11 @@ public class PlayerHealth : MonoBehaviour
 
         SpawnDamageText(amount);
 
+        // ---------------------------------------------------
+        // PLAY ONE OF SEVERAL DAMAGE SOUNDS RANDOMLY
+        // ---------------------------------------------------
+        PlayRandomDamageSound();
+
         if (currentHealth <= 0)
         {
             currentHealth = 0;
@@ -110,6 +119,21 @@ public class PlayerHealth : MonoBehaviour
         }
 
         UpdateHealthUI();
+    }
+
+    // ============================
+    // RANDOM DAMAGE SFX PICKER
+    // ============================
+    private void PlayRandomDamageSound()
+    {
+        if (playerDamageSounds == null || playerDamageSounds.Length == 0)
+            return;
+
+        int index = Random.Range(0, playerDamageSounds.Length);
+        AudioClip clip = playerDamageSounds[index];
+
+        if (clip != null)
+            AudioManager.Instance.PlaySFX(clip);
     }
 
     // ============================
