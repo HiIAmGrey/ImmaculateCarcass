@@ -25,7 +25,7 @@ public class PlayerHealth : MonoBehaviour
 
     [Header("Damage SFX (multiple clips)")]
     public AudioClip[] playerDamageSounds;  
-    // will randomly pick one when the player gets hurt
+    // randomly picks one when the player gets hurt
 
     // ============================
     // LIFECYCLE
@@ -198,6 +198,14 @@ public class PlayerHealth : MonoBehaviour
     void Die()
     {
         Debug.Log("Player died.");
-        // Add death animation, scene transitions, etc.
+
+        // Save the game so the player keeps progress
+        PersistentGameState.SaveFromGame();
+
+        // Restore HP so player doesn't respawn at 0 HP
+        PersistentGameState.playerCurrentHP = PersistentGameState.playerMaxHP;
+
+        // Load the Death Scene
+        UnityEngine.SceneManagement.SceneManager.LoadScene("DeathScene");
     }
 }
