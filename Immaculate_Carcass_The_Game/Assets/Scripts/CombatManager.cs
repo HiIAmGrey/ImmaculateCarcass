@@ -72,6 +72,14 @@ public class CombatManager : MonoBehaviour
     {
         enemies.Remove(enemy);
 
+         // CHECK FOR FINAL BOSS
+      if (enemy.GetComponent<BossTag>() != null &&
+        enemy.GetComponent<BossTag>().isFinalBoss)
+            {
+                Debug.Log("Final boss defeated — loading VictoryScene!");
+                SceneManager.LoadScene("VictoryScene");
+                return;
+            }
         if (enemies.Count == 0)
         {
             Debug.Log("All enemies defeated. Combat ends!");
