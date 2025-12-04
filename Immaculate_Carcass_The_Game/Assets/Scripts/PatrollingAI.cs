@@ -128,30 +128,34 @@ public class PatrollingAI : MonoBehaviour
 
         Debug.Log("Chasing player!");
 
-        // COMBAT TRIGGER LOGIC
-        if (distToPlayer <= engageCombatDistance)
-        {
-            Debug.Log("Enemy reached player — loading combat scene!");
+       if (distToPlayer <= engageCombatDistance)
+                {
+                    Debug.Log("Enemy reached player — loading combat scene!");
 
-            // Save player position before combat
-            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-            if (playerObj != null)
-            {
-                PersistentGameState.savedPlayerPos = playerObj.transform.position;
-                PersistentGameState.hasSavedPlayerPos = true;
-            }
+                    // Save player position before combat
+                    GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+                    if (playerObj != null)
+                    {
+                        PersistentGameState.savedPlayerPos = playerObj.transform.position;
+                        PersistentGameState.hasSavedPlayerPos = true;
+                    }
 
-            // Save all game data
-            PersistentGameState.SaveFromGame();
+                    // Mark this overworld enemy as permanently dead
+                    PersistentGameState.overworldAIDead[aiID] = true;
+                    PersistentGameState.SaveFromGame();
 
-            // Pass encounter ID
-            PersistentGameState.isOverworldEncounter = true;
-            EnemyEncounterManager.SetEncounterID(aiID);
+                    // Pass encounter ID to combat
+                    PersistentGameState.isOverworldEncounter = true;
+                    EnemyEncounterManager.SetEncounterID(aiID);
 
-            // Load combat
-            SceneManager.LoadScene("CombatScene_BigUgly");
-            return;
-        }
+                    // Destroy this overworld object so it never comes back
+                    Destroy(gameObject, 0.1f);
+
+                    // Load the correct combat scene
+                    SceneManager.LoadScene("CombatScene_BigUgly");
+                    return;
+                }
+
 
         if (distToPlayer > stopChaseRange)
         {
