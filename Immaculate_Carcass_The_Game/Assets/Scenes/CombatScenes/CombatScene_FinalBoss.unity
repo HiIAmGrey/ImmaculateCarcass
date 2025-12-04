@@ -1230,6 +1230,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Body
       objectReference: {fileID: 0}
+    - target: {fileID: 7717434752109093335, guid: 5fcaa3307e281bc4a830fccaf491bb24,
+        type: 3}
+      propertyPath: enemyHealth
+      value: 150
+      objectReference: {fileID: 0}
     - target: {fileID: 8404700476201288011, guid: 5fcaa3307e281bc4a830fccaf491bb24,
         type: 3}
       propertyPath: m_Name
@@ -2011,6 +2016,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
   enemyHealth: 100
   enemyDamage: 4
+  damageVariance: 1
+  critChance: 0.05
+  critMultiplier: 1.4
   damageNumberPrefab: {fileID: 7469945538737787350, guid: e3641cc4911ebe144ab09bd54c4978e8,
     type: 3}
   damageSpawnPoint: {fileID: 1866825252}

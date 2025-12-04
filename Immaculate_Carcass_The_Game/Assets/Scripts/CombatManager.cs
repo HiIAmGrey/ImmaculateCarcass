@@ -90,9 +90,14 @@ public class CombatManager : MonoBehaviour
             selectedEnemy = enemies[0];
     }
 
-    public void ExitCombat()
+  public void ExitCombat()
     {
-        // MARK OVERWORLD AI AS DEAD  BUT ONLY IF THE ENCOUNTER WAS FROM A PATROLLING AI
+        // Heal player slightly after combat (20% of missing HP)
+        int missing = PlayerHealth.Instance.maxHealth - PlayerHealth.Instance.currentHealth;
+        int healAmount = Mathf.RoundToInt(missing * 0.20f);
+        PlayerHealth.Instance.Heal(healAmount);
+
+        // MARK OVERWORLD AI AS DEAD BUT ONLY IF IT WAS A PATROLLING ENEMY
         if (PersistentGameState.encounterID >= 100)
         {
             PersistentGameState.overworldAIDead[PersistentGameState.encounterID] = true;
@@ -100,5 +105,6 @@ public class CombatManager : MonoBehaviour
 
         SceneManager.LoadScene("GameScene");
     }
+
 
 }

@@ -4,7 +4,12 @@ using System.Collections;
 public class EnemyController : MonoBehaviour
 {
     public int enemyHealth = 20;
-    public int enemyDamage = 3;
+
+    [Header("Damage")]
+    public int enemyDamage = 3;     // base damage
+    public int damageVariance = 1;  // +/- this value
+    public float critChance = 0.05f;
+    public float critMultiplier = 1.4f;
 
     public GameObject damageNumberPrefab;
     public Transform damageSpawnPoint;
@@ -14,17 +19,16 @@ public class EnemyController : MonoBehaviour
 
     public GameObject targetArrow;
 
-    private Animator anim;  // Enemy's animator (optional)
+    private Animator anim;
 
     void Awake()
     {
-        // Grab animator if the enemy has one
         anim = GetComponentInChildren<Animator>();
     }
 
     public void TakeDamage(int dmg)
     {
-        // Spawn floating damage numbers
+        // Floating number UI
         Vector3 screenPos = Camera.main.WorldToScreenPoint(damageSpawnPoint.position);
 
         GameObject dmgNum = Instantiate(damageNumberPrefab, CombatManager.Instance.combatCanvas);
@@ -37,22 +41,20 @@ public class EnemyController : MonoBehaviour
 
         dmgNum.GetComponent<FloatingDamage>().ShowDamage(dmg);
 
-        // Apply actual damage
+        // Apply real damage
         enemyHealth -= dmg;
         if (enemyHealth < 0) enemyHealth = 0;
 
-         // Eyeball Hit Anim
-       if (anim != null)
-{
-    // Only play Hit trigger if it exists
-    if (anim.runtimeAnimatorController != null &&
-        HasParameter(anim, "Hit", AnimatorControllerParameterType.Trigger))
-    {
-        anim.SetTrigger("Hit");
-    }
-}
+        // Hit animation (if "Hit" trigger exists)
+        if (anim != null)
+        {
+            if (anim.runtimeAnimatorController != null &&
+                HasParameter(anim, "Hit", AnimatorControllerParameterType.Trigger))
+            {
+                anim.SetTrigger("Hit");
+            }
+        }
 
-        // Update UI
         onEnemyDamaged?.Invoke();
 
         if (enemyHealth <= 0)
@@ -61,32 +63,37 @@ public class EnemyController : MonoBehaviour
 
     public void TakeTurn()
     {
-        // Play the enemy’s attack animation (if it has one)
+        // Play attack animation if exists
         if (anim != null)
             anim.SetTrigger("Attack");
 
-        // Delay the hit so it lines up with the animation
         CombatManager.Instance.StartCoroutine(DoDelayedAttack());
     }
 
     private IEnumerator DoDelayedAttack()
     {
-        // Small delay before damage lands
         yield return new WaitForSeconds(0.6f);
 
-        int dmg = enemyDamage;
+        // Base damage + variance
+        int dmg = enemyDamage + Random.Range(-damageVariance, damageVariance + 1);
+        if (dmg < 1) dmg = 1;
 
-        // Guard reduces damage (one-time block)
+        // Crit
+        if (Random.value < critChance)
+        {
+            dmg = Mathf.RoundToInt(dmg * critMultiplier);
+            Debug.Log("ENEMY CRITICAL HIT!");
+        }
+
+        // Guarding reduces damage
         if (PlayerCombat.Instance.isGuarding)
         {
             dmg = Mathf.RoundToInt(dmg * 0.5f);
             PlayerCombat.Instance.isGuarding = false;
         }
 
-        // Deal damage to player
         PlayerHealth.Instance.TakeDamage(dmg);
 
-        // Enemy turn ends afterward
         TurnManager.Instance.EndEnemyTurn();
     }
 
@@ -106,14 +113,14 @@ public class EnemyController : MonoBehaviour
         if (targetArrow != null)
             targetArrow.SetActive(on);
     }
-    private bool HasParameter(Animator animator, string paramName, AnimatorControllerParameterType type)
-        {
-            foreach (AnimatorControllerParameter param in animator.parameters)
-            {
-                if (param.type == type && param.name == paramName)
-                    return true;
-            }
-            return false;
-        }
 
+    private bool HasParameter(Animator animator, string paramName, AnimatorControllerParameterType type)
+    {
+        foreach (AnimatorControllerParameter param in animator.parameters)
+        {
+            if (param.type == type && param.name == paramName)
+                return true;
+        }
+        return false;
+    }
 }
