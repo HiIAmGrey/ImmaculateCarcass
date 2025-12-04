@@ -5,24 +5,27 @@ public class UIInteractionPrompt : MonoBehaviour
 {
     public static UIInteractionPrompt Instance;
 
-    [Header("References")]
-    public GameObject promptPanel;   
-    public TMP_Text promptText;       
+    public GameObject promptPanel;
+    public TMP_Text promptText;
 
     void Awake()
     {
+        // simple singleton so other scripts can call ShowPrompt()
         Instance = this;
-        HidePrompt();
     }
 
-    public void ShowPrompt(string message)
+    public void ShowPrompt(string msg)
     {
-        promptText.text = message;
-        promptPanel.SetActive(true);
+        if (promptPanel != null)
+            promptPanel.SetActive(true);
+
+        if (promptText != null)
+            promptText.text = msg;
     }
 
     public void HidePrompt()
     {
-        promptPanel.SetActive(false);
+        if (promptPanel != null)
+            promptPanel.SetActive(false);
     }
 }

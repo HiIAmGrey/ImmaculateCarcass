@@ -14,7 +14,6 @@ public class EnemyController : MonoBehaviour
 
     [Header("Hit Sound Settings")]
     // These are the custom hit sounds you assign per enemy prefab.
-    // Slime gets wet/splat sounds, ghost gets airy/echo sounds, golem gets rock impacts, etc.
     public AudioClip[] hitSounds;
 
     [Header("UI / Visuals")]
@@ -37,7 +36,7 @@ public class EnemyController : MonoBehaviour
     // ============================================
     public void TakeDamage(int dmg)
     {
-        // Floating damage number setup
+        // floating damage text
         Vector3 screenPos = Camera.main.WorldToScreenPoint(damageSpawnPoint.position);
         GameObject dmgNum = Instantiate(damageNumberPrefab, CombatManager.Instance.combatCanvas);
 
@@ -50,22 +49,21 @@ public class EnemyController : MonoBehaviour
 
         dmgNum.GetComponent<FloatingDamage>().ShowDamage(dmg);
 
-        // Apply real damage
+        // apply real damage
         enemyHealth -= dmg;
         if (enemyHealth < 0)
             enemyHealth = 0;
 
-        // Play hit animation if this enemy has one
+        // hit animation
         if (anim != null && anim.runtimeAnimatorController != null)
         {
             if (HasParameter(anim, "Hit", AnimatorControllerParameterType.Trigger))
                 anim.SetTrigger("Hit");
         }
 
-        // Play hit sound (each enemy prefab has its own custom list)
+        // hit sound
         PlayHitSound();
 
-        // Notify UI or combat manager
         onEnemyDamaged?.Invoke();
 
         if (enemyHealth <= 0)
@@ -77,14 +75,10 @@ public class EnemyController : MonoBehaviour
     // ============================================
     private void PlayHitSound()
     {
-        // No sound assigned? Just skip.
         if (hitSounds == null || hitSounds.Length == 0)
             return;
 
-        // Pick a random clip from the list
         AudioClip chosen = hitSounds[Random.Range(0, hitSounds.Length)];
-
-        // Play the clip through the global SFX channel
         AudioManager.Instance.PlaySFX(chosen);
     }
 
@@ -93,7 +87,6 @@ public class EnemyController : MonoBehaviour
     // ============================================
     public void TakeTurn()
     {
-        // Play attack animation
         if (anim != null)
             anim.SetTrigger("Attack");
 
@@ -102,31 +95,24 @@ public class EnemyController : MonoBehaviour
 
     private IEnumerator DoDelayedAttack()
     {
-        // Delay to sync with animation impact
         yield return new WaitForSeconds(0.6f);
 
-        // Damage variance
         int dmg = enemyDamage + Random.Range(-damageVariance, damageVariance + 1);
         if (dmg < 1) dmg = 1;
 
-        // Critical hit
         if (Random.value < critChance)
         {
             dmg = Mathf.RoundToInt(dmg * critMultiplier);
             Debug.Log("Enemy CRITICAL hit!");
         }
 
-        // Guard reduces incoming damage
         if (PlayerCombat.Instance.isGuarding)
         {
             dmg = Mathf.RoundToInt(dmg * 0.5f);
             PlayerCombat.Instance.isGuarding = false;
         }
 
-        // Give damage to player
         PlayerHealth.Instance.TakeDamage(dmg);
-
-        // End enemy turn
         TurnManager.Instance.EndEnemyTurn();
     }
 
@@ -138,14 +124,20 @@ public class EnemyController : MonoBehaviour
         Debug.Log("Enemy died!");
         PlayerStats.Instance.AddXP(5);
 
-        onEnemyDied?.Invoke();
-        CombatManager.Instance.EnemyDied(this);
+        // detect final boss (does NOT break any existing fights)
+        BossTag boss = GetComponent<BossTag>();
+        bool isFinalBoss = (boss != null && boss.isFinalBoss);
 
-        Destroy(gameObject); // clean up object
+        onEnemyDied?.Invoke();
+
+        // pass final boss flag to CombatManager
+        CombatManager.Instance.EnemyDied(this, isFinalBoss);
+
+        Destroy(gameObject);
     }
 
     // ============================================
-    //   TARGET ARROW TOGGLE
+    //   TARGET ARROW
     // ============================================
     public void SetTargetArrow(bool on)
     {
@@ -154,7 +146,7 @@ public class EnemyController : MonoBehaviour
     }
 
     // ============================================
-    //   UTILITY: Check Animator Params
+    //   UTILITY
     // ============================================
     private bool HasParameter(Animator animator, string paramName, AnimatorControllerParameterType type)
     {

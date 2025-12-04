@@ -16,17 +16,20 @@ public class CombatManager : MonoBehaviour
 
     public EnemyController selectedEnemy;
 
+    // tracks whether this combat ended with a final boss kill
+    private bool finalBossDefeated = false;
+
     void Awake()
     {
         Instance = this;
 
-        // get all enemies in the scene
-        EnemyController[] foundEnemies = FindObjectsOfType<EnemyController>();
-        enemies.AddRange(foundEnemies);
+        // find all enemies in this combat scene
+        EnemyController[] found = FindObjectsOfType<EnemyController>();
+        enemies.AddRange(found);
 
+        // make a UI entry for each enemy
         foreach (var e in enemies)
         {
-            // make a UI entry for each enemy
             var ui = Instantiate(enemyUIPrefab, enemyUIPanel);
             ui.GetComponent<EnemyUIEntry>().Initialize(e);
 
@@ -45,7 +48,9 @@ public class CombatManager : MonoBehaviour
 
     public EnemyController GetCurrentEnemy()
     {
-        if (enemies.Count == 0) return null;
+        if (enemies.Count == 0)
+            return null;
+
         return enemies[currentEnemyIndex];
     }
 
@@ -57,47 +62,78 @@ public class CombatManager : MonoBehaviour
             e.SetTargetArrow(e == enemy);
     }
 
-    public void EnemyDied(EnemyController enemy)
+    // ============================================================
+    // UPDATED SIGNATURE: EnemyController now calls EnemyDied(this, isFinalBoss)
+    // ============================================================
+    public void EnemyDied(EnemyController enemy, bool isFinalBoss)
     {
         enemies.Remove(enemy);
 
+        // store this so ExitCombat() can respond properly
+        if (isFinalBoss)
+            finalBossDefeated = true;
+
+        // if all enemies died, end combat
         if (enemies.Count == 0)
         {
-            // all enemies dead -> combat over
-
-            // if this was a grave fight (references encounter ids)
-            if (PersistentGameState.encounterID >= 10)
-            {
-                int graveID = PersistentGameState.encounterID - 10;
-
-                // now the grave is officially cleared
-                PersistentGameState.graveDug[graveID] = true;
-                PersistentGameState.graveCount++;
-            }
-
-            if (enemyUIPanel != null)
-                enemyUIPanel.gameObject.SetActive(false);
-
+            HandleCombatWin();
             ExitCombat();
             return;
         }
 
-        // make sure we don't go out of range
+        // clamp index
         if (currentEnemyIndex >= enemies.Count)
             currentEnemyIndex = enemies.Count - 1;
 
-        if (selectedEnemy == enemy)
+        // switch selection if needed
+        if (selectedEnemy == enemy && enemies.Count > 0)
             selectedEnemy = enemies[0];
+    }
+
+    // handles grave wins + overworld wins
+    private void HandleCombatWin()
+    {
+        // grave fights use activeGraveID
+        if (PersistentGameState.activeGraveID != -1)
+        {
+            int gid = PersistentGameState.activeGraveID;
+
+            PersistentGameState.graveDug[gid] = true;
+            PersistentGameState.graveCount++;
+
+            PersistentGameState.activeGraveID = -1;
+        }
+
+        // overworld AI uses encounterID but must be inside array bounds
+        if (PersistentGameState.isOverworldEncounter)
+        {
+            int id = PersistentGameState.encounterID;
+
+            if (id >= 0 && id < PersistentGameState.overworldAIDead.Length)
+                PersistentGameState.overworldAIDead[id] = true;
+        }
+
+        Debug.Log(
+            $"WIN → isOverworldEncounter={PersistentGameState.isOverworldEncounter}, " +
+            $"encounterID={PersistentGameState.encounterID}, " +
+            $"finalBoss={finalBossDefeated}"
+        );
     }
 
     public void ExitCombat()
     {
-        // overworld AI should stay dead if the fight came from one
-        if (PersistentGameState.encounterID >= 0 && PersistentGameState.encounterID < 10)
+        // 🚨 NEW: If final boss was killed, go to victory scene
+        if (finalBossDefeated)
         {
-            PersistentGameState.overworldAIDead[PersistentGameState.encounterID] = true;
+            Debug.Log("FINAL BOSS DEFEATED — Loading VictoryScene!");
+            SceneManager.LoadScene("VictoryScene");
+            return;
         }
 
+        // reset overworld flag when leaving combat
+        PersistentGameState.isOverworldEncounter = false;
+
+        // return to overworld normally
         SceneManager.LoadScene("GameScene");
     }
 }

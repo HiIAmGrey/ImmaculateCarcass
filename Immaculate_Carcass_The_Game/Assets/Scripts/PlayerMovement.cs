@@ -26,7 +26,7 @@ public class PlayerController : MonoBehaviour
     {
         // Debugging animation state
          if (anim != null)
-        Debug.Log("isMoving parameter = " + anim.GetBool("isMoving"));
+       // Debug.Log("isMoving parameter = " + anim.GetBool("isMoving"));
         // Detect left click
         if (Input.GetMouseButtonDown(0))
         {

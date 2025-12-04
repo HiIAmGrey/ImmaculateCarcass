@@ -3,17 +3,21 @@ using UnityEngine.SceneManagement;
 
 public class DeathMenu : MonoBehaviour
 {
-    // Called by Retry button
     public void Retry()
     {
-        // Restore HP
+        // restore HP
         PersistentGameState.playerCurrentHP = PersistentGameState.playerMaxHP;
 
-        // Reload the overworld
+        // clear encounter flags so enemy respawns
+        PersistentGameState.isOverworldEncounter = false;
+        PersistentGameState.encounterID = -1;
+
+        // do NOT touch overworldAIDead[] here
+        // Player Lost so Enemy not flagged
+
         SceneManager.LoadScene("GameScene");
     }
 
-    // Called by Quit button
     public void QuitToMenu()
     {
         SceneManager.LoadScene("MainMenu");

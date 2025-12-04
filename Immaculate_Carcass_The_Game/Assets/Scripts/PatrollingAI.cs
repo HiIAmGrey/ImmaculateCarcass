@@ -3,7 +3,7 @@ using UnityEngine.SceneManagement;
 
 public class PatrollingAI : MonoBehaviour
 {
-    public int aiID = 0; // used for persistent death tracking
+    public int aiID = 0; // overworld enemy ID for persistence
 
     public float speed = 3f;
     public float patrolRadius = 5f;
@@ -24,7 +24,7 @@ public class PatrollingAI : MonoBehaviour
 
     void Start()
     {
-        // Prevent respawning dead enemies
+        // don't respawn dead overworld mobs
         if (PersistentGameState.overworldAIDead[aiID])
         {
             gameObject.SetActive(false);
@@ -32,49 +32,30 @@ public class PatrollingAI : MonoBehaviour
         }
 
         GameObject p = GameObject.FindGameObjectWithTag("Player");
-
-        if (p == null)
-        {
-            Debug.LogError("⚠️ ERROR: No GameObject tagged 'Player' found in scene!");
-        }
-        else
-        {
+        if (p != null)
             player = p.transform;
-        }
 
         PickNewPatrolTarget();
     }
 
     void Update()
     {
-        if (player == null)
-            return;
+        if (player == null) return;
 
         float distToPlayer = Vector3.Distance(transform.position, player.position);
 
         switch (state)
         {
-            case AIState.Patrol:
-                PatrolBehavior(distToPlayer);
-                break;
-
-            case AIState.Waiting:
-                WaitingBehavior(distToPlayer);
-                break;
-
-            case AIState.Chase:
-                ChaseBehavior(distToPlayer);
-                break;
-
-            case AIState.Return:
-                ReturnBehavior(distToPlayer);
-                break;
+            case AIState.Patrol: PatrolBehavior(distToPlayer); break;
+            case AIState.Waiting: WaitingBehavior(distToPlayer); break;
+            case AIState.Chase: ChaseBehavior(distToPlayer); break;
+            case AIState.Return: ReturnBehavior(distToPlayer); break;
         }
     }
 
-    // ─────────────────────────────────────────────
-    // Patrol State
-    // ─────────────────────────────────────────────
+    // ---------------------------------------------------------------
+    // Patrol state
+    // ---------------------------------------------------------------
     void PatrolBehavior(float distToPlayer)
     {
         if (distToPlayer <= chaseRange)
@@ -96,9 +77,9 @@ public class PatrollingAI : MonoBehaviour
         }
     }
 
-    // ─────────────────────────────────────────────
-    // Waiting State
-    // ─────────────────────────────────────────────
+    // ---------------------------------------------------------------
+    // Waiting
+    // ---------------------------------------------------------------
     void WaitingBehavior(float distToPlayer)
     {
         if (distToPlayer <= chaseRange)
@@ -115,9 +96,9 @@ public class PatrollingAI : MonoBehaviour
         }
     }
 
-    // ─────────────────────────────────────────────
-    // Chase State
-    // ─────────────────────────────────────────────
+    // ---------------------------------------------------------------
+    // Chase + combat start
+    // ---------------------------------------------------------------
     void ChaseBehavior(float distToPlayer)
     {
         transform.position = Vector3.MoveTowards(
@@ -126,47 +107,21 @@ public class PatrollingAI : MonoBehaviour
             speed * 1.2f * Time.deltaTime
         );
 
-        Debug.Log("Chasing player!");
-
-       if (distToPlayer <= engageCombatDistance)
-                {
-                    Debug.Log("Enemy reached player — loading combat scene!");
-
-                    // Save player position before combat
-                    GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-                    if (playerObj != null)
-                    {
-                        PersistentGameState.savedPlayerPos = playerObj.transform.position;
-                        PersistentGameState.hasSavedPlayerPos = true;
-                    }
-
-                    // Mark this overworld enemy as permanently dead
-                    PersistentGameState.overworldAIDead[aiID] = true;
-                    PersistentGameState.SaveFromGame();
-
-                    // Pass encounter ID to combat
-                    PersistentGameState.isOverworldEncounter = true;
-                    EnemyEncounterManager.SetEncounterID(aiID);
-
-                    // Destroy this overworld object so it never comes back
-                    Destroy(gameObject, 0.1f);
-
-                    // Load the correct combat scene
-                    SceneManager.LoadScene("CombatScene_BigUgly");
-                    return;
-                }
-
+        if (distToPlayer <= engageCombatDistance)
+        {
+            StartOverworldCombat();
+            return;
+        }
 
         if (distToPlayer > stopChaseRange)
         {
-            Debug.Log("Player escaped — returning to patrol point.");
             state = AIState.Return;
         }
     }
 
-    // ─────────────────────────────────────────────
-    // Return State
-    // ─────────────────────────────────────────────
+    // ---------------------------------------------------------------
+    // Return to patrol
+    // ---------------------------------------------------------------
     void ReturnBehavior(float distToPlayer)
     {
         if (distToPlayer <= chaseRange)
@@ -187,9 +142,39 @@ public class PatrollingAI : MonoBehaviour
         }
     }
 
-    // ─────────────────────────────────────────────
-    // Helpers
-    // ─────────────────────────────────────────────
+    // ---------------------------------------------------------------
+    // Start Combat (THIS IS THE FIXED FUNCTION)
+    // ---------------------------------------------------------------
+    void StartOverworldCombat()
+    {
+        Debug.Log($"Overworld encounter triggered by AI {aiID}");
+
+        // mark encounter as overworld fight
+        PersistentGameState.isOverworldEncounter = true;
+
+        // ✅ THIS is the correct ID the CombatManager will read
+        PersistentGameState.encounterID = aiID;
+
+        // save player position
+        GameObject p = GameObject.FindGameObjectWithTag("Player");
+        if (p != null)
+        {
+            PersistentGameState.savedPlayerPos = p.transform.position;
+            PersistentGameState.hasSavedPlayerPos = true;
+        }
+
+        PersistentGameState.SaveFromGame();
+
+        // remove overworld AI immediately so it cannot duplicate
+        Destroy(gameObject);
+
+        // load the overworld combat scene
+        SceneManager.LoadScene("CombatScene_BigUgly");
+    }
+
+    // ---------------------------------------------------------------
+    // Helper to choose a new random patrol point
+    // ---------------------------------------------------------------
     void PickNewPatrolTarget()
     {
         Vector2 circle = Random.insideUnitCircle * patrolRadius;

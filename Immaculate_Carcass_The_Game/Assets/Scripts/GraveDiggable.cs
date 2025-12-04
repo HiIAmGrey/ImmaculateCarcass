@@ -76,8 +76,8 @@ public class GraveDiggable : MonoBehaviour
         if (digSFX != null)
             AudioManager.Instance.PlaySFX(digSFX);
 
-        // not marking the grave as dug here anymore due to poor logic i did earlier
-        // (player must actually win the fight first)
+        // not marking the grave as dug here anymore
+        // player has to actually win the fight first
 
         // show dug color right away
         SetToDugAppearance();
@@ -89,7 +89,10 @@ public class GraveDiggable : MonoBehaviour
                 // this isn't an overworld AI fight
                 PersistentGameState.isOverworldEncounter = false;
 
-                // graves start at encounterID 10
+                // remember which grave this combat is for
+                PersistentGameState.activeGraveID = graveID;
+
+                // graves start at encounterID 10 (keeping your existing pattern)
                 EnemyEncounterManager.SetEncounterID(10 + graveID);
 
                 // save player pos before combat

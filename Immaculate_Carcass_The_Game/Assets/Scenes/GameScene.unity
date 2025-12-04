@@ -1449,6 +1449,50 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GraveDiggable
   graveID: 1
   digSFX: {fileID: 8300000, guid: 98b7677874bfae149832054d5aa15f00, type: 3}
+--- !u!1 &1029533724
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1029533726}
+  - component: {fileID: 1029533725}
+  m_Layer: 0
+  m_Name: GameInitializer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1029533725
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1029533724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8582990f227b504c88f80c428abcbdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+--- !u!4 &1029533726
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1029533724}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2101.3193, y: 910.68524, z: 951.33514}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1178127152
 GameObject:
   m_ObjectHideFlags: 0
@@ -3414,6 +3458,7 @@ GameObject:
   - component: {fileID: 9061683306884875277}
   - component: {fileID: 9061683306884875278}
   - component: {fileID: 9061683306884875279}
+  - component: {fileID: 9061683306884875280}
   m_Layer: 0
   m_Name: Ghost
   m_TagString: Untagged
@@ -3731,7 +3776,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bec7c2a9bcc71764cb7d6396e0b9ac43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PatrollingAI
-  aiID: 0
+  aiID: 9
   speed: 150
   patrolRadius: 500
   waitTime: 2
@@ -3774,6 +3819,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GhostReveal
   gravesRequired: 000000000100000002000000
+--- !u!114 &9061683306884875280
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8207306317017201585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4433da0135853d6459407cecfc5a124d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyController
+  enemyHealth: 20
+  enemyDamage: 3
+  damageVariance: 1
+  critChance: 0.05
+  critMultiplier: 1.4
+  hitSounds: []
+  damageNumberPrefab: {fileID: 0}
+  damageSpawnPoint: {fileID: 0}
+  targetArrow: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -3793,3 +3859,4 @@ SceneRoots:
   - {fileID: 9061683306884875276}
   - {fileID: 8843556371764021052}
   - {fileID: 8828609566476550501}
+  - {fileID: 1029533726}

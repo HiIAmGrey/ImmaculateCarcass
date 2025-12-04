@@ -22,6 +22,9 @@ public static class PersistentGameState
     public static bool[] graveDug = new bool[3];
     public static int graveCount = 0;
 
+    // track which grave fight we’re currently in
+    public static int activeGraveID = -1;
+
     // quest progress from QuestNPC
     // 0 = NotStarted, 1 = InProgress, 2 = Completed, 3 = FinalBattle
     public static int questState = 0;
@@ -37,7 +40,7 @@ public static class PersistentGameState
     {
         if (PlayerStats.Instance != null)
         {
-          playerXP = PlayerStats.Instance.xp;
+            playerXP = PlayerStats.Instance.xp;
             PlayerStats.Instance.xp = playerXP;
         }
 
@@ -107,6 +110,7 @@ public static class PersistentGameState
 
         graveDug = new bool[3];
         graveCount = 0;
+        activeGraveID = -1;
 
         questState = 0;
 
