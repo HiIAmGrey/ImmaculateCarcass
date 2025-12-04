@@ -2028,6 +2028,7 @@ MonoBehaviour:
   damageVariance: 1
   critChance: 0.05
   critMultiplier: 1.4
+  hitSounds: []
   damageNumberPrefab: {fileID: 7469945538737787350, guid: e3641cc4911ebe144ab09bd54c4978e8,
     type: 3}
   damageSpawnPoint: {fileID: 1866825252}
@@ -4072,6 +4073,10 @@ MonoBehaviour:
   damageVariance: 1
   critChance: 0.05
   critMultiplier: 1.4
+  hitSounds:
+  - {fileID: 8300000, guid: 60a69b3408229e742b72233e8229e5d2, type: 3}
+  - {fileID: 8300000, guid: 5a612c5c862ae0e44938f1d28e4d80c1, type: 3}
+  - {fileID: 8300000, guid: 492ade1357b135a4da0a128372697c85, type: 3}
   damageNumberPrefab: {fileID: 7469945538737787350, guid: e3641cc4911ebe144ab09bd54c4978e8,
     type: 3}
   damageSpawnPoint: {fileID: 1503081918}

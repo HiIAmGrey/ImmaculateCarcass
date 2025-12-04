@@ -1441,6 +1441,26 @@ PrefabInstance:
       propertyPath: enemyHealth
       value: 150
       objectReference: {fileID: 0}
+    - target: {fileID: 7717434752109093335, guid: 5fcaa3307e281bc4a830fccaf491bb24,
+        type: 3}
+      propertyPath: hitSounds.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7717434752109093335, guid: 5fcaa3307e281bc4a830fccaf491bb24,
+        type: 3}
+      propertyPath: 'hitSounds.Array.data[0]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 9f6322f2c5cf2254a822b18e22014771, type: 3}
+    - target: {fileID: 7717434752109093335, guid: 5fcaa3307e281bc4a830fccaf491bb24,
+        type: 3}
+      propertyPath: 'hitSounds.Array.data[1]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 54d83c1c8583a884794730c42dc922d7, type: 3}
+    - target: {fileID: 7717434752109093335, guid: 5fcaa3307e281bc4a830fccaf491bb24,
+        type: 3}
+      propertyPath: 'hitSounds.Array.data[2]'
+      value: 
+      objectReference: {fileID: 8300000, guid: c9d605d30bfd8f447a57f31cdcedf044, type: 3}
     - target: {fileID: 8404700476201288011, guid: 5fcaa3307e281bc4a830fccaf491bb24,
         type: 3}
       propertyPath: m_Name
@@ -2224,6 +2244,7 @@ MonoBehaviour:
   damageVariance: 1
   critChance: 0.05
   critMultiplier: 1.4
+  hitSounds: []
   damageNumberPrefab: {fileID: 7469945538737787350, guid: e3641cc4911ebe144ab09bd54c4978e8,
     type: 3}
   damageSpawnPoint: {fileID: 1866825252}

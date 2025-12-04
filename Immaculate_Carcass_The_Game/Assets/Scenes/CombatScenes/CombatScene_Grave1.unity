@@ -659,11 +659,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4433da0135853d6459407cecfc5a124d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
-  enemyHealth: 27
+  enemyHealth: 50
   enemyDamage: 6
   damageVariance: 1
   critChance: 0.05
   critMultiplier: 1.4
+  hitSounds:
+  - {fileID: 8300000, guid: 5cadba217c5559e41b1077988fab4057, type: 3}
+  - {fileID: 8300000, guid: 6d399144be74b624db06846e7c2a670a, type: 3}
+  - {fileID: 8300000, guid: ec16e3638170ff64da8c4b209ddd85b2, type: 3}
   damageNumberPrefab: {fileID: 7469945538737787350, guid: e3641cc4911ebe144ab09bd54c4978e8,
     type: 3}
   damageSpawnPoint: {fileID: 92243977}
@@ -2388,6 +2392,7 @@ MonoBehaviour:
   damageVariance: 1
   critChance: 0.05
   critMultiplier: 1.4
+  hitSounds: []
   damageNumberPrefab: {fileID: 7469945538737787350, guid: e3641cc4911ebe144ab09bd54c4978e8,
     type: 3}
   damageSpawnPoint: {fileID: 1866825252}
