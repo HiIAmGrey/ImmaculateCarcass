@@ -16,6 +16,15 @@ public class ShovelPickup : MonoBehaviour
         UIInteractionPrompt.Instance.ShowPrompt("Press E to pick up shovel");
     }
 
+        void Start()
+            {
+                if (PersistentGameState.hasShovel)
+                {
+                    // Player already picked this up
+                    Destroy(gameObject);
+                }
+            }
+
     void OnTriggerExit(Collider other)
     {
         if (!other.CompareTag("Player"))
@@ -38,10 +47,13 @@ public class ShovelPickup : MonoBehaviour
 
     void PickupShovel()
     {
-        // actually give the shovel to the player
+        //  give the shovel to the player
         PlayerInventory.Instance.hasShovel = true;
 
-        // play pickup sound (simple and clean)
+        // MAKE IT PERSISTENT ✔
+        PersistentGameState.hasShovel = true;
+
+        // play pickup sound 
         if (shovelPickupSFX != null)
             AudioManager.Instance.PlaySFX(shovelPickupSFX);
 
@@ -51,4 +63,5 @@ public class ShovelPickup : MonoBehaviour
         // remove the shovel object from the world
         Destroy(gameObject);
     }
+
 }

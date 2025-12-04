@@ -3408,13 +3408,14 @@ GameObject:
   - component: {fileID: 9061683306884875276}
   - component: {fileID: 9061683306884875277}
   - component: {fileID: 9061683306884875278}
+  - component: {fileID: 9061683306884875279}
   m_Layer: 0
   m_Name: Ghost
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &8416272008565869914
 GameObject:
   m_ObjectHideFlags: 0
@@ -3755,6 +3756,19 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: -41.8, y: 206.3, z: 0}
+--- !u!114 &9061683306884875279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8207306317017201585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 334b9548682abb242adc0019009ce1c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GhostReveal
+  gravesRequired: 000000000100000002000000
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
