@@ -7,8 +7,7 @@ public class GraveDiggable : MonoBehaviour
 
     public int graveID = 0;
 
-    // dig sound (played when the grave actually gets dug up)
-    public AudioClip digSFX;
+    public AudioClip digSFX; // play when grave is dug
 
     private Renderer rend;
 
@@ -16,32 +15,29 @@ public class GraveDiggable : MonoBehaviour
     {
         rend = GetComponent<Renderer>();
 
-        // Restore appearance if grave was already dug
+        // if this grave was already cleared, show the dug version
         if (PersistentGameState.graveDug[graveID])
-        {
             SetToDugAppearance();
-        }
     }
 
     void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player")) return;
 
-        // Grave already dug
+        // already cleared
         if (PersistentGameState.graveDug[graveID])
         {
             UIInteractionPrompt.Instance.ShowPrompt("This grave has already been dug.");
             return;
         }
 
-        // Shovel required
+        // shovel check
         if (!PlayerInventory.Instance.hasShovel)
         {
             UIInteractionPrompt.Instance.ShowPrompt("You need a shovel to dig here.");
             return;
         }
 
-        // otherwise we're good to dig
         playerInRange = true;
         UIInteractionPrompt.Instance.ShowPrompt("Press E to dig");
     }
@@ -56,10 +52,11 @@ public class GraveDiggable : MonoBehaviour
 
     void Update()
     {
-        if (playerInRange && Input.GetKeyDown(KeyCode.E))
+        if (!playerInRange) return;
+
+        if (Input.GetKeyDown(KeyCode.E))
         {
-            if (PersistentGameState.graveDug[graveID])
-                return;
+            if (PersistentGameState.graveDug[graveID]) return;
 
             if (!PlayerInventory.Instance.hasShovel)
             {
@@ -75,45 +72,40 @@ public class GraveDiggable : MonoBehaviour
     {
         UIInteractionPrompt.Instance.HidePrompt();
 
-        // play the dig sound 
+        // play dig sound
         if (digSFX != null)
             AudioManager.Instance.PlaySFX(digSFX);
 
-        // update persistent game state
-        PersistentGameState.graveDug[graveID] = true;
-        PersistentGameState.graveCount++;
+        // not marking the grave as dug here anymore due to poor logic i did earlier
+        // (player must actually win the fight first)
 
-        // visual change
+        // show dug color right away
         SetToDugAppearance();
 
-        // digging dialogue BEFORE combat
+        // show dialogue before the fight
         DialogueManager.Instance.ShowDialogue(
             () =>
             {
-                // After dialogue finishes:
-
-                // Mark this is NOT an overworld AI encounter
+                // this isn't an overworld AI fight
                 PersistentGameState.isOverworldEncounter = false;
 
-                // Use encounter IDs for graves
+                // graves start at encounterID 10
                 EnemyEncounterManager.SetEncounterID(10 + graveID);
 
-                // Save the player position before combat
-                var player = GameObject.FindGameObjectWithTag("Player");
-                if (player != null)
+                // save player pos before combat
+                var p = GameObject.FindGameObjectWithTag("Player");
+                if (p != null)
                 {
-                    PersistentGameState.savedPlayerPos = player.transform.position;
+                    PersistentGameState.savedPlayerPos = p.transform.position;
                     PersistentGameState.hasSavedPlayerPos = true;
                 }
 
-                // Save all game data
                 PersistentGameState.SaveFromGame();
 
-                // Load unique combat scene for THIS grave
+                // load the grave's combat scene
                 SceneManager.LoadScene($"CombatScene_Grave{graveID}");
             },
 
-            // Dialogue lines
             "You disturb the silent soil...",
             "Something stirs beneath the grave..."
         );

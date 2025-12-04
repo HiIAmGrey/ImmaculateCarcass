@@ -13,8 +13,8 @@ public class PlayerHealth : MonoBehaviour
     private float smoothFill = 1f;
 
     [Header("UI Elements")]
-    public Image hpFill;           
-    public TMP_Text hpText;        
+    public Image hpFill;
+    public TMP_Text hpText;
     public Transform damageSpawnPoint;
     public GameObject playerDamagePrefab;
 
@@ -27,9 +27,10 @@ public class PlayerHealth : MonoBehaviour
     public AudioClip[] playerDamageSounds;  
     // randomly picks one when the player gets hurt
 
-    // ============================
-    // LIFECYCLE
-    // ============================
+    [Header("Death SFX")]
+    public AudioClip playerDeathSFX;  
+    // plays when the player dies
+
     void Awake()
     {
         Instance = this;
@@ -37,7 +38,7 @@ public class PlayerHealth : MonoBehaviour
 
     void Start()
     {
-        // Load HP from persistent system
+        // load HP from the persistent system
         maxHealth = PersistentGameState.playerMaxHP;
         currentHealth = PersistentGameState.playerCurrentHP;
 
@@ -53,16 +54,12 @@ public class PlayerHealth : MonoBehaviour
         UpdateHealthUI();
     }
 
-    // ============================
-    // DAMAGE
-    // ============================
+    // player takes damage
     public void TakeDamage(int amount)
     {
         Debug.Log("PlayerHealth.TakeDamage CALLED => " + amount);
 
-        // ----------------------------------------
-        // GUARD DAMAGE REDUCTION
-        // ----------------------------------------
+        // guard damage reduction
         if (PlayerCombat.Instance.isGuarding)
         {
             amount = Mathf.RoundToInt(amount * 0.5f);
@@ -70,9 +67,7 @@ public class PlayerHealth : MonoBehaviour
             Debug.Log("Guard reduced damage to: " + amount);
         }
 
-        // ----------------------------------------
-        // SHIELD ABSORPTION
-        // ----------------------------------------
+        // shield handling
         if (shieldAmount > 0)
         {
             int absorbed = Mathf.Min(shieldAmount, amount);
@@ -89,6 +84,7 @@ public class PlayerHealth : MonoBehaviour
                 Debug.Log("Shield broke!");
             }
 
+            // shield ate all the damage
             if (amount <= 0)
             {
                 SpawnDamageText(absorbed);
@@ -96,22 +92,19 @@ public class PlayerHealth : MonoBehaviour
             }
         }
 
-        // ----------------------------------------
-        // APPLY HP DAMAGE
-        // ----------------------------------------
+        // apply damage
         currentHealth -= amount;
 
-        // persistent save
+        // save new HP
         PersistentGameState.playerCurrentHP = currentHealth;
         PersistentGameState.playerMaxHP = maxHealth;
 
         SpawnDamageText(amount);
 
-        // ---------------------------------------------------
-        // PLAY ONE OF SEVERAL DAMAGE SOUNDS RANDOMLY
-        // ---------------------------------------------------
+        // play a random damage sound
         PlayRandomDamageSound();
 
+        // check for death
         if (currentHealth <= 0)
         {
             currentHealth = 0;
@@ -121,9 +114,7 @@ public class PlayerHealth : MonoBehaviour
         UpdateHealthUI();
     }
 
-    // ============================
-    // RANDOM DAMAGE SFX PICKER
-    // ============================
+    // play random hurt sound
     private void PlayRandomDamageSound()
     {
         if (playerDamageSounds == null || playerDamageSounds.Length == 0)
@@ -136,9 +127,7 @@ public class PlayerHealth : MonoBehaviour
             AudioManager.Instance.PlaySFX(clip);
     }
 
-    // ============================
-    // HEALING
-    // ============================
+    // heal the player
     public void Heal(int amount)
     {
         currentHealth += amount;
@@ -150,9 +139,7 @@ public class PlayerHealth : MonoBehaviour
         UpdateHealthUI();
     }
 
-    // ============================
-    // UI UPDATE
-    // ============================
+    // update HP bar + number
     private void UpdateHealthUI()
     {
         if (hpFill != null)
@@ -161,9 +148,9 @@ public class PlayerHealth : MonoBehaviour
             smoothFill = Mathf.Lerp(smoothFill, targetFill, Time.deltaTime * 12f);
             hpFill.fillAmount = smoothFill;
 
-            // HP color gradient
+            // hp color gradient
             Color healthy = new Color(0.5f, 0f, 0f);
-            Color dying   = new Color(0.15f, 0f, 0f);
+            Color dying = new Color(0.15f, 0f, 0f);
             hpFill.color = Color.Lerp(dying, healthy, smoothFill);
         }
 
@@ -171,9 +158,7 @@ public class PlayerHealth : MonoBehaviour
             hpText.text = $"{currentHealth}/{maxHealth}";
     }
 
-    // ============================
-    // DAMAGE FLOATING TEXT
-    // ============================
+    // floating damage text
     private void SpawnDamageText(int amount)
     {
         if (playerDamagePrefab != null && damageSpawnPoint != null)
@@ -192,20 +177,30 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
-    // ============================
-    // DEATH
-    // ============================
+    // player death
     void Die()
     {
         Debug.Log("Player died.");
 
-        // Save the game so the player keeps progress
+        // save game before death scene
         PersistentGameState.SaveFromGame();
 
-        // Restore HP so player doesn't respawn at 0 HP
+        // restore HP so the player doesn't reload at 0 HP
         PersistentGameState.playerCurrentHP = PersistentGameState.playerMaxHP;
 
-        // Load the Death Scene
+        // play death sfx if assigned
+        if (playerDeathSFX != null)
+            AudioManager.Instance.PlaySFX(playerDeathSFX);
+
+        // short delay so the sound is actually audible
+        StartCoroutine(LoadDeathSceneAfterDelay(1f));
+    }
+
+    // delay before switching scenes
+    private System.Collections.IEnumerator LoadDeathSceneAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
         UnityEngine.SceneManagement.SceneManager.LoadScene("DeathScene");
     }
 }

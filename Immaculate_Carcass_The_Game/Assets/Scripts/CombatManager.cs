@@ -11,31 +11,27 @@ public class CombatManager : MonoBehaviour
     public List<EnemyController> enemies = new List<EnemyController>();
     public int currentEnemyIndex = 0;
 
-    public GameObject enemyUIPrefab;   
+    public GameObject enemyUIPrefab;
     public Transform enemyUIPanel;
 
-    // whichever enemy the player clicked on
-    public EnemyController selectedEnemy; 
+    public EnemyController selectedEnemy;
 
     void Awake()
     {
         Instance = this;
 
-        // grab every enemy in the scene
+        // get all enemies in the scene
         EnemyController[] foundEnemies = FindObjectsOfType<EnemyController>();
         enemies.AddRange(foundEnemies);
 
-        Debug.Log("CombatManager found " + enemies.Count + " enemies.");
-
-        // make a UI entry for each enemy
-        foreach (var enemy in enemies)
+        foreach (var e in enemies)
         {
-            GameObject ui = Instantiate(enemyUIPrefab, enemyUIPanel);
-            ui.GetComponent<EnemyUIEntry>().Initialize(enemy);
+            // make a UI entry for each enemy
+            var ui = Instantiate(enemyUIPrefab, enemyUIPanel);
+            ui.GetComponent<EnemyUIEntry>().Initialize(e);
 
-            // auto-select the first enemy so there's always a valid target
             if (selectedEnemy == null)
-                selectedEnemy = enemy;
+                selectedEnemy = e;
         }
 
         if (enemies.Count == 0 && enemyUIPanel != null)
@@ -49,9 +45,7 @@ public class CombatManager : MonoBehaviour
 
     public EnemyController GetCurrentEnemy()
     {
-        if (enemies.Count == 0)
-            return null;
-
+        if (enemies.Count == 0) return null;
         return enemies[currentEnemyIndex];
     }
 
@@ -60,29 +54,26 @@ public class CombatManager : MonoBehaviour
         selectedEnemy = enemy;
 
         foreach (var e in enemies)
-        {
-            bool isSelected = (e == enemy);
-            e.SetTargetArrow(isSelected);
-        }
-
-        Debug.Log("Selected enemy: " + enemy.gameObject.name);
+            e.SetTargetArrow(e == enemy);
     }
 
     public void EnemyDied(EnemyController enemy)
     {
         enemies.Remove(enemy);
 
-         // CHECK FOR FINAL BOSS
-      if (enemy.GetComponent<BossTag>() != null &&
-        enemy.GetComponent<BossTag>().isFinalBoss)
-            {
-                Debug.Log("Final boss defeated — loading VictoryScene!");
-                SceneManager.LoadScene("VictoryScene");
-                return;
-            }
         if (enemies.Count == 0)
         {
-            Debug.Log("All enemies defeated. Combat ends!");
+            // all enemies dead -> combat over
+
+            // if this was a grave fight (references encounter ids)
+            if (PersistentGameState.encounterID >= 10)
+            {
+                int graveID = PersistentGameState.encounterID - 10;
+
+                // now the grave is officially cleared
+                PersistentGameState.graveDug[graveID] = true;
+                PersistentGameState.graveCount++;
+            }
 
             if (enemyUIPanel != null)
                 enemyUIPanel.gameObject.SetActive(false);
@@ -91,6 +82,7 @@ public class CombatManager : MonoBehaviour
             return;
         }
 
+        // make sure we don't go out of range
         if (currentEnemyIndex >= enemies.Count)
             currentEnemyIndex = enemies.Count - 1;
 
@@ -98,21 +90,14 @@ public class CombatManager : MonoBehaviour
             selectedEnemy = enemies[0];
     }
 
-  public void ExitCombat()
+    public void ExitCombat()
     {
-        // Heal player slightly after combat (20% of missing HP)
-        int missing = PlayerHealth.Instance.maxHealth - PlayerHealth.Instance.currentHealth;
-        int healAmount = Mathf.RoundToInt(missing * 0.20f);
-        PlayerHealth.Instance.Heal(healAmount);
-
-        // MARK OVERWORLD AI AS DEAD BUT ONLY IF IT WAS A PATROLLING ENEMY
-        if (PersistentGameState.encounterID >= 100)
+        // overworld AI should stay dead if the fight came from one
+        if (PersistentGameState.encounterID >= 0 && PersistentGameState.encounterID < 10)
         {
             PersistentGameState.overworldAIDead[PersistentGameState.encounterID] = true;
         }
 
         SceneManager.LoadScene("GameScene");
     }
-
-
 }

@@ -2741,6 +2741,11 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7089870324256161403, guid: b18229435a2d0d64e88981c5f9ce9840,
+        type: 3}
+      propertyPath: playerDeathSFX
+      value: 
+      objectReference: {fileID: 8300000, guid: 111fd069c50b1e040adc409fa948652d, type: 3}
     - target: {fileID: 7506953043855947198, guid: b18229435a2d0d64e88981c5f9ce9840,
         type: 3}
       propertyPath: m_LocalScale.x

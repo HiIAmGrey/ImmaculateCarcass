@@ -193,6 +193,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: eb510c27fa3241f42a0337e98d2f5f4c, type: 3}
   - {fileID: 8300000, guid: e28696bf36daf8a4992ea8f2fdf47b95, type: 3}
   - {fileID: 8300000, guid: 63b8ae42048e1c24fb991d24f8355c95, type: 3}
+  playerDeathSFX: {fileID: 8300000, guid: 111fd069c50b1e040adc409fa948652d, type: 3}
 --- !u!1 &2216387881672656424
 GameObject:
   m_ObjectHideFlags: 0
