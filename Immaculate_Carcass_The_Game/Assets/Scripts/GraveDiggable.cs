@@ -7,6 +7,9 @@ public class GraveDiggable : MonoBehaviour
 
     public int graveID = 0;
 
+    // dig sound (played when the grave actually gets dug up)
+    public AudioClip digSFX;
+
     private Renderer rend;
 
     void Start()
@@ -38,7 +41,7 @@ public class GraveDiggable : MonoBehaviour
             return;
         }
 
-        // Otherwise ready to dig
+        // otherwise we're good to dig
         playerInRange = true;
         UIInteractionPrompt.Instance.ShowPrompt("Press E to dig");
     }
@@ -72,14 +75,18 @@ public class GraveDiggable : MonoBehaviour
     {
         UIInteractionPrompt.Instance.HidePrompt();
 
-        // Update persistent memory
+        // play the dig sound 
+        if (digSFX != null)
+            AudioManager.Instance.PlaySFX(digSFX);
+
+        // update persistent game state
         PersistentGameState.graveDug[graveID] = true;
         PersistentGameState.graveCount++;
 
-        // Visual change
+        // visual change
         SetToDugAppearance();
 
-        // Show digging dialogue BEFORE combat
+        // digging dialogue BEFORE combat
         DialogueManager.Instance.ShowDialogue(
             () =>
             {
@@ -88,7 +95,7 @@ public class GraveDiggable : MonoBehaviour
                 // Mark this is NOT an overworld AI encounter
                 PersistentGameState.isOverworldEncounter = false;
 
-                // Use encounter IDs 10+ for graves
+                // Use encounter IDs for graves
                 EnemyEncounterManager.SetEncounterID(10 + graveID);
 
                 // Save the player position before combat

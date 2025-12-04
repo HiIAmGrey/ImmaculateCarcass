@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
@@ -6,76 +5,70 @@ public class DialogueManager : MonoBehaviour
 {
     public static DialogueManager Instance;
 
-    [Header("Dialogue UI")]
+    [Header("UI References")]
     public GameObject dialogueBox;
-    public TMP_Text dialogueText;
-    public TMP_Text continueHint;
+    public TMP_Text dialogueText;   // now supports TMP
 
-    private Queue<string> lines = new Queue<string>();
-    private bool dialogueActive = false;
+    [Header("Audio")]
+    public AudioClip dialogueBlipSFX;
+    public float blipCooldown = 0.05f;
 
-    private System.Action onDialogueFinished;
+    private float nextBlipTime = 0f;
+
+    private string[] lines;
+    private int index = 0;
+    private System.Action onFinished;
 
     void Awake()
     {
         Instance = this;
-        HideDialogue();
     }
 
-    void Update()
+    public void ShowDialogue(System.Action finishedCallback, params string[] dialogueLines)
     {
-        if (dialogueActive && Input.GetKeyDown(KeyCode.Space))
-        {
-            DisplayNextLine();
-        }
+        onFinished = finishedCallback;
+        lines = dialogueLines;
+        index = 0;
+
+        dialogueBox.SetActive(true);
+        DisplayLine();
     }
 
-    //  VERSION 1 — NO CALLBACK 
     public void ShowDialogue(params string[] dialogueLines)
     {
         ShowDialogue(null, dialogueLines);
     }
 
-    //  VERSION 2 — CALLBACK VERSION
-    public void ShowDialogue(System.Action finishedCallback, params string[] dialogueLines)
+    void Update()
     {
-        onDialogueFinished = finishedCallback;
+        if (!dialogueBox.activeSelf) return;
 
-        lines.Clear();
-        foreach (string line in dialogueLines)
-            lines.Enqueue(line);
-
-        dialogueActive = true;
-        dialogueBox.SetActive(true);
-        continueHint.gameObject.SetActive(true);
-
-        DisplayNextLine();
+        if (Input.GetKeyDown(KeyCode.Space))
+            NextLine();
     }
 
-    private void DisplayNextLine()
+    void DisplayLine()
     {
-        if (lines.Count == 0)
-        {
-            HideDialogue();
+        dialogueText.text = lines[index];
 
-            // Run callback AFTER the dialogue ends
-            onDialogueFinished?.Invoke();
-            onDialogueFinished = null;
+        // play blip effect if assigned
+        if (dialogueBlipSFX && Time.time >= nextBlipTime)
+        {
+            AudioManager.Instance.PlaySFX(dialogueBlipSFX);
+            nextBlipTime = Time.time + blipCooldown;
+        }
+    }
+
+    void NextLine()
+    {
+        index++;
+        if (index >= lines.Length)
+        {
+            dialogueBox.SetActive(false);
+            onFinished?.Invoke();
             return;
         }
 
-        string nextLine = lines.Dequeue();
-        dialogueText.text = nextLine;
-        continueHint.gameObject.SetActive(true);
-    }
-
-    public void HideDialogue()
-    {
-        dialogueActive = false;
-        dialogueBox.SetActive(false);
-        dialogueText.text = "";
-
-        if (continueHint != null)
-            continueHint.gameObject.SetActive(false);
+        DisplayLine();
     }
 }
